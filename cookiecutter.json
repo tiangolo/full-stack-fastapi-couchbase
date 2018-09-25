@@ -11,19 +11,18 @@
     "secret_key": "changethis",
     "first_superuser": "admin@{{cookiecutter.domain_main}}",
     "first_superuser_password": "changethis",
-    
 
-    "postgres_password": "changethis",
-    "pgadmin_default_user": "{{cookiecutter.first_superuser}}",
-    "pgadmin_default_user_password": "changethis",
-    
+    "couchdb_user": "admin",
+    "couchdb_password": "changethis",
+    "couchdb_cors_origins": "http://{{cookiecutter.domain_dev}}, http://{{cookiecutter.domain_dev}}:5984, http://{{cookiecutter.domain_dev}}:4200, http://{{cookiecutter.domain_dev}}:3000, http://{{cookiecutter.domain_dev}}:8080, https://{{cookiecutter.domain_staging}}, https://db.{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, https://db.{{cookiecutter.domain_main}}",
+
     "traefik_constraint_tag": "{{cookiecutter.domain_main}}",
     "traefik_constraint_tag_staging": "{{cookiecutter.domain_staging}}",
     "traefik_public_network": "traefik-public",
     "traefik_public_constraint_tag": "traefik-public",
-    
+
     "flower_auth": "root:changethis",
-    
+
     "sentry_dsn": "",
 
     "docker_image_prefix": "",
