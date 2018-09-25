@@ -1,6 +1,6 @@
 version: '3'
 services:
-  pgadmin:
+  couchdb:
     networks:
       - {{cookiecutter.traefik_public_network}}
       - default

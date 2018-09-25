@@ -1,12 +1,12 @@
 version: '3'
 services:
-  db:
+  couchdb:
     volumes:
-      - app-db-data:/var/lib/postgresql/data/pgdata
+      - app-couchdb-data:/opt/couchdb/data
     deploy:
       placement:
         constraints:
-          - node.labels.${STACK_NAME}.app-db-data == true
+          - node.labels.${STACK_NAME}.app-couchdb-data == true
   proxy:
     deploy:
       placement:
@@ -14,4 +14,4 @@ services:
           - node.role == manager
 
 volumes:
-  app-db-data:
+  app-couchdb-data:

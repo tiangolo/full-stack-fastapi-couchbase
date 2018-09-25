@@ -1,13 +1,13 @@
 version: '3'
 services:
-  pgadmin:
+  couchdb:
     deploy:
       labels:
-        - traefik.frontend.rule=Host:pgadmin.${DOMAIN}
+        - traefik.frontend.rule=Host:db.${DOMAIN}
         - traefik.enable=true
-        - traefik.port=5050
+        - traefik.port=5984
         - traefik.tags=${TRAEFIK_PUBLIC_TAG}
-        - traefik.docker.network={{cookiecutter.traefik_public_network}}
+        - traefik.docker.network=traefik-public
         # Traefik service that listens to HTTP
         - traefik.redirectorservice.frontend.entryPoints=http
         - traefik.redirectorservice.frontend.redirect.entryPoint=https

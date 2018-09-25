@@ -1,8 +1,8 @@
 version: '3'
 services:
-  pgadmin:
+  couchdb:
     ports:
-      - '5050:5050'
+      - '5984:5984'
   proxy:
     ports:
       - '80:80'

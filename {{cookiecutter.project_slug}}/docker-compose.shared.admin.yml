@@ -1,12 +1,5 @@
 version: '3'
 services:
-  pgadmin:
-    image: fenglc/pgadmin4
-    depends_on:
-      - db
-    environment:
-      - DEFAULT_USER={{cookiecutter.pgadmin_default_user}}
-      - DEFAULT_PASSWORD={{cookiecutter.pgadmin_default_user_password}}
   swagger-ui:
     image: swaggerapi/swagger-ui
     environment:
