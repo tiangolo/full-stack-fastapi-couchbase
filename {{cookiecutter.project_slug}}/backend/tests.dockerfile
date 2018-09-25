@@ -1,6 +1,6 @@
 FROM python:3.6
 
-RUN pip install requests faker==0.8.4 pytest tenacity psycopg2-binary SQLAlchemy==1.1.13 passlib[bcrypt]
+RUN pip install requests pytest tenacity passlib[bcrypt] cloudant==2.9.0
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
