@@ -8,19 +8,14 @@ from flask_jwt_extended import create_access_token, get_current_user, jwt_requir
 from webargs import fields
 
 # Import app code
+from app.main import app
 from ..api_docs import docs, security_params
 from app.core import config
-from app.core.security import pwd_context, verify_password
-from app.db.flask_session import db_session
-from app.db.utils import get_user_by_username, get_user_hashed_password, get_user_id
-from app.main import app
+from app.db.utils import authenticate_user, check_if_user_is_active
 
 # Import Schemas
 from app.schemas.token import TokenSchema
 from app.schemas.user import UserSchema
-
-# Import models
-from app.models.user import User
 
 
 @docs.register
@@ -34,19 +29,21 @@ from app.models.user import User
 )
 @marshal_with(TokenSchema())
 def route_login_access_token(username, password):
-    user = get_user_by_username(username, db_session)
-
-    if not user or not verify_password(password, get_user_hashed_password(user)):
+    user = authenticate_user(username, password)
+    if not user:
         abort(400, "Incorrect email or password")
-    elif not user.is_active:
+    elif not check_if_user_is_active(user):
         abort(400, "Inactive user")
     access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
-            identity=get_user_id(user), expires_delta=access_token_expires
+            identity=username, expires_delta=access_token_expires
         ),
         "token_type": "bearer",
     }
+
+
+# OAuth2 compatible token login, get an access token for future requests has a test in test_token
 
 
 @docs.register
@@ -62,6 +59,9 @@ def route_test_token(test):
     else:
         abort(400, "No user")
     return current_user
+
+
+# Test access token has a test in test_token
 
 
 @docs.register
@@ -88,3 +88,6 @@ def route_manual_test_token(test):
     else:
         abort(400, "No user")
     return current_user
+
+
+# Test access token has a test in test_token
