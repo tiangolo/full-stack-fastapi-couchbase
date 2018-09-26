@@ -5,7 +5,6 @@ from raven.contrib.flask import Sentry
 
 # Import app code
 from app.main import app
-from app.db.flask_session import db_session
 from app.db.init_db import init_db
 from app.core import config
 
@@ -21,13 +20,3 @@ app.config["SECRET_KEY"] = config.SECRET_KEY
 app.config["SERVER_NAME"] = config.SERVER_NAME
 
 sentry = Sentry(app, dsn=config.SENTRY_DSN)
-
-
-@app.teardown_appcontext
-def shutdown_db_session(exception=None):
-    db_session.remove()
-
-
-@app.before_first_request
-def setup():
-    init_db(db_session)
