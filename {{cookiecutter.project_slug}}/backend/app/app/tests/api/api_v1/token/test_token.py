@@ -3,8 +3,6 @@ import requests
 
 # Import app code
 from app.core import config
-
-# Import testing code
 from app.tests.utils.utils import get_server_api
 
 
@@ -32,4 +30,16 @@ def test_use_access_token(superuser_token_headers):
     )
     result = r.json()
     assert r.status_code == 200
-    assert "id" in result
+    assert "_id" in result
+
+
+def test_use_access_token_manual(superuser_token_headers):
+    server_api = get_server_api()
+    r = requests.post(
+        f"{server_api}{config.API_V1_STR}/login/manual-test-token",
+        headers=superuser_token_headers,
+        json={"test": "test"},
+    )
+    result = r.json()
+    assert r.status_code == 200
+    assert "_id" in result
