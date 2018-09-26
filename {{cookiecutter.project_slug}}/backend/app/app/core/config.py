@@ -15,18 +15,19 @@ SECRET_KEY = os.getenvb(b"SECRET_KEY")
 if not SECRET_KEY:
     SECRET_KEY = os.urandom(32)
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days
+ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 days
 
 SERVER_NAME = os.getenv("SERVER_NAME")
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 
-POSTGRES_SERVER = os.getenv("POSTGRES_SERVER")
-POSTGRES_USER = os.getenv("POSTGRES_USER")
-POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD")
-POSTGRES_DB = os.getenv("POSTGRES_DB")
-SQLALCHEMY_DATABASE_URI = (
-    f"postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_SERVER}/{POSTGRES_DB}"
-)
+COUCHDB_USER = os.getenv("COUCHDB_USER")
+COUCHDB_PASSWORD = os.getenv("COUCHDB_PASSWORD")
+COUCHDB_URL = "http://couchdb:5984"
+COUCHDB_CORS_ORIGINS = os.getenv("COUCHDB_CORS_ORIGINS")  # a string of origins separated by commas, e.g: "http://dev.example.com, http://dev.example.com:5984, http://dev.example.com:4200, http://dev.example.com:3000, http://dev.example.com:8080, https://stag.example.com, https://db.stag.example.com, https://example.com, https://db.example.com"
+COUCHDB_AUTH_TIMEOUT = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+
+ROLE_ACTIVE = "active"
+ROLE_SUPERUSER = "superuser"
 
 FIRST_SUPERUSER = os.getenv("FIRST_SUPERUSER")
 FIRST_SUPERUSER_PASSWORD = os.getenv("FIRST_SUPERUSER_PASSWORD")
