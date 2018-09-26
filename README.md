@@ -1,10 +1,10 @@
-# Base Project
+# Full Stack Flask CouchDB - project generator
 
-[![Build Status](https://travis-ci.org/tiangolo/full-stack.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack)
+[![Build Status](https://travis-ci.org/tiangolo/full-stack-flask-couchdb.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-flask-couchdb)
 
-Generate a back end and front end stack using Python, including interactive API documentation.
+Generate a backend and frontend stack using Python, including interactive API documentation.
 
-[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack)
+[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack-flask-couchdb)
 
 ## Features
 
@@ -18,18 +18,16 @@ Generate a back end and front end stack using Python, including interactive API 
   * Webargs: parse, validate and document inputs to the endpoint / route
   * Secure password hashing by default
   * JWT token authentication
-  * SQLAlchemy models (independent of Flask extensions, so they can be used with Celery workers directly)
-  * Basic starting models for users and groups (modify and remove as you need)
-  * Alembic migrations
+  * Basic starting functionality for users and roles (modify and remove as you need)
   * CORS (Cross Origin Resource Sharing)
-* Celery worker that can import and use models and code from the rest of the back end selectively (you don't have to install the complete app in each worker)
-* REST back end tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, CouchDB, or whatever you want, and just test that the API works)
+* Celery worker that can import and use code from the rest of the backend selectively (you don't have to install the complete app in each worker)
+* NoSQL CouchDB database that supports direct synchronization for offline-first applications
+* REST back end tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, or whatever you want, and just test that the API works).
 * Easy Python integration with Jupyter Kernels for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
 * Angular front end with:
   * Docker server based on Nginx
   * Docker multi-stage building, so you don't need to save or commit compiled code
   * Docker building integrated tests with Chrome Headless
-* PGAdmin for PostgreSQL database, you can modify it to use PHPMyAdmin and MySQL easily
 * Swagger-UI for live interactive documentation
 * Flower for Celery jobs monitoring
 * Load balancing between front end and back end with Traefik, so you can have both under the same domain, separated by path, but served by different containers
@@ -42,7 +40,7 @@ Go to the directoy where you want to create your project and run:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack
+cookiecutter https://github.com/tiangolo/full-stack-flask-couchdb
 ```
 
 ### Generate passwords
@@ -77,9 +75,9 @@ The input variables, with their default values (some auto generated) are:
 * `first_superuser`: The first superuser generated, with it you will be able to create more users, etc. By default, based on the domain.
 * `first_superuser_password`: First superuser password. Use the method above to generate it.
  
-* `postgres_password`: Postgres database password. Use the method above to generate it. (You could easily modify it to use MySQL, MariaDB, etc).
-* `pgadmin_default_user`: PGAdmin default user, to log-in to the PGAdmin interface.
-* `pgadmin_default_user_password`: PGAdmin default user password. Generate it with the method above.
+* `couchdb_user`: CouchDB main user to be used by the application (code). By default `admin`.
+* `couchdb_password`: Password of the main user, for the backend code. Generate it with the method above.
+* `couchdb_cors_origins`: List of origins that the database should allow to talk to directly.
  
 * `traefik_constraint_tag`: The tag to be used by the internal Traefik load balancer (for example, to divide requests between back end and front end) for production. Used to separate this stack from any other stack you might have. This should identify each stack in each environment (production, staging, etc).
 * `traefik_constraint_tag_staging`: The Traefik tag to be used while on staging. 

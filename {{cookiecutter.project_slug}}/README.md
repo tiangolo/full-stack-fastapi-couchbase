@@ -28,7 +28,7 @@ Backend, JSON based web API, with Swagger automatic documentation: http://{{cook
 
 Swagger UI, frontend user interface to interact with the API live: http://{{cookiecutter.domain_dev}}/swagger/
 
-PGAdmin, PostgreSQL web administration: http://{{cookiecutter.domain_dev}}:5050
+CouchDB, web administration: http://{{cookiecutter.domain_dev}}:5984/_utils
 
 Flower, administration of Celery tasks: http://{{cookiecutter.domain_dev}}:5555
 
@@ -158,46 +158,6 @@ If you need to install any additional package for the tests, add it to the file 
 If you use GitLab CI the tests will automaticall.dockerfiley.
 
 
-### Migrations
-
-As in local development your app directory is mounted as a volume inside the container (set in the file `docker-compose.dev.volumes.yml`), you can also run the migrations with `alembic` commands inside the container and the migration code will be in your app directory (instead of being only inside the container). So you can add it to your git repository.
-
-Make sure you create a "revision" of your models and that you "upgrade" your database with that revision every time you change them. As this is what will update the tables in your database. Otherwise, your application will have errors.
-
-* Start an interactive session in the backend container:
-
-```bash
-docker-compose exec backend bash
-```
-
-* After changing a model (for example, adding a column), inside the container, create a revision, e.g.:
-
-```bash
-alembic revision --autogenerate -m "Add column last_name to User model"
-```
-
-* Commit to the git repository the files generated in the alembic directory.
-
-* After creating the revision, run the migration in the database (this is what will actually change the database):
-
-```bash
-alembic upgrade head
-```
-
-If you don't want to use migrations at all, uncomment the line in the file at `./backend/app/app/db/init_db.py` with:
-
-```python
-Base.metadata.create_all(bind=engine)
-```
-
-and comment the line in the file `prestart.sh` that contains:
-
-```bash
-alembic upgrade head
-```
-
-If you don't want to start with the default models and want to remove them / modify them, from the beginning, without having any previous revision, you can remove the revision files (`.py` Python files) under `./backend/app/alembic/versions/`. And then create a first migration as described above.
-
 ## Frontend development
 
 * Enter the `frontend` directory, install the NPM packages and start it the `npm` scrits:
@@ -242,13 +202,13 @@ To use and expand that environment variable inside the `docker-compose.deploy.vo
 ```yaml
 version: '3'
 services:
-  db:
+  couchdb:
     volumes:
-      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+      - app-couchdb-data:/opt/couchdb/data
     deploy:
       placement:
         constraints:
-          - node.labels.${STACK_NAME}.app-db-data == true
+          - node.labels.${STACK_NAME}.app-couchdb-data == true
 ```
 
 note the `${STACK_NAME}`. In the script `./script-deploy.sh`, that `docker-compose.deploy.volumes-placement.yml` would be converted, and saved to a file `docker-stack.yml` containing:
@@ -256,9 +216,9 @@ note the `${STACK_NAME}`. In the script `./script-deploy.sh`, that `docker-compo
 ```yaml
 version: '3'
 services:
-  db:
+  couchdb:
     volumes:
-      - 'app-db-data:/var/lib/postgresql/data/pgdata'
+      - app-couchdb-data:/opt/couchdb/data
     deploy:
       placement:
         constraints:
@@ -427,7 +387,7 @@ Backend: https://{{cookiecutter.domain_main}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_main}}/swagger/
 
-PGAdmin: https://pgadmin.{{cookiecutter.domain_main}}
+CouchDB: https://db.{{cookiecutter.domain_main}}/_utils
 
 Flower: https://flower.{{cookiecutter.domain_main}}
 
@@ -441,7 +401,7 @@ Backend: https://{{cookiecutter.domain_staging}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
 
-PGAdmin: https://pgadmin.{{cookiecutter.domain_staging}}
+CouchDB: https://db.{{cookiecutter.domain_staging}}/_utils
 
 Flower: https://flower.{{cookiecutter.domain_staging}}
     
@@ -455,7 +415,7 @@ Brontend: http://{{cookiecutter.domain_dev}}/api/
 
 Swagger UI: http://{{cookiecutter.domain_dev}}/swagger/
 
-PGAdmin: http://{{cookiecutter.domain_dev}}:5050
+CouchDB: http://{{cookiecutter.domain_dev}}:5984/_utils
 
 Flower: http://{{cookiecutter.domain_dev}}:5555
 
@@ -473,9 +433,9 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 * `secret_key`: {{cookiecutter.secret_key}}
 * `first_superuser`: {{cookiecutter.first_superuser}}
 * `first_superuser_password`: {{cookiecutter.first_superuser_password}}
-* `postgres_password`: {{cookiecutter.postgres_password}}
-* `pgadmin_default_user`: {{cookiecutter.pgadmin_default_user}}
-* `pgadmin_default_user_password`: {{cookiecutter.pgadmin_default_user_password}}
+* `couchdb_user`: {{cookiecutter.couchdb_user}}
+* `couchdb_password`: {{cookiecutter.couchdb_password}}
+* `couchdb_cors_origins`: {{cookiecutter.couchdb_cors_origins}}
 * `traefik_constraint_tag`: {{cookiecutter.traefik_constraint_tag}}
 * `traefik_constraint_tag_staging`: {{cookiecutter.traefik_constraint_tag_staging}}
 * `traefik_public_network`: {{cookiecutter.traefik_public_network}}
