@@ -5,9 +5,7 @@ from cloudant.document import Document
 
 class RemoteCouchDatabase(CouchDatabase):
     def __init__(self, client, database_name, fetch_limit=100, remote=True):
-        super(RemoteCouchDatabase, self).__init__(
-            client, database_name, fetch_limit
-        )
+        super(RemoteCouchDatabase, self).__init__(client, database_name, fetch_limit)
         self.remote = remote
 
     def keys(self, remote=None):

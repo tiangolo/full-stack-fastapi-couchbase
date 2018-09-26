@@ -23,7 +23,9 @@ SENTRY_DSN = os.getenv("SENTRY_DSN")
 COUCHDB_USER = os.getenv("COUCHDB_USER")
 COUCHDB_PASSWORD = os.getenv("COUCHDB_PASSWORD")
 COUCHDB_URL = "http://couchdb:5984"
-COUCHDB_CORS_ORIGINS = os.getenv("COUCHDB_CORS_ORIGINS")  # a string of origins separated by commas, e.g: "http://dev.example.com, http://dev.example.com:5984, http://dev.example.com:4200, http://dev.example.com:3000, http://dev.example.com:8080, https://stag.example.com, https://db.stag.example.com, https://example.com, https://db.example.com"
+COUCHDB_CORS_ORIGINS = os.getenv(
+    "COUCHDB_CORS_ORIGINS"
+)  # a string of origins separated by commas, e.g: "http://dev.example.com, http://dev.example.com:5984, http://dev.example.com:4200, http://dev.example.com:3000, http://dev.example.com:8080, https://stag.example.com, https://db.stag.example.com, https://example.com, https://db.example.com"
 COUCHDB_AUTH_TIMEOUT = ACCESS_TOKEN_EXPIRE_MINUTES * 60
 
 ROLE_ACTIVE = "active"

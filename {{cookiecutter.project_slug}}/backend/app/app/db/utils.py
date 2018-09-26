@@ -146,6 +146,7 @@ def check_if_user_is_superuser(user):
 # check_if_user_is_superuser has several tests: test_check_if_user_is_superuser,
 # test_check_if_user_is_superuser_normal_user
 
+
 def get_db_app_doc(_id, db_app=None, client=None):
     if not db_app:
         db_app = get_db_app()

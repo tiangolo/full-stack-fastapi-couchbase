@@ -11,6 +11,7 @@ from app.db.database import (
     setup_cookie,
 )
 
+
 def init_db():
     # Secure main DB access by adding a single dummy user 'app'
     client = get_client()

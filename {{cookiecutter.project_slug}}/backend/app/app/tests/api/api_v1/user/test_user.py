@@ -8,7 +8,12 @@ import requests
 from app.tests.utils.utils import random_lower_string, get_server_api
 from app.tests.utils.user import user_authentication_headers
 from app.core import config
-from app.db.utils import create_or_get_user, get_user, get_database_for_user, get_database_id_for_user
+from app.db.utils import (
+    create_or_get_user,
+    get_user,
+    get_database_for_user,
+    get_database_id_for_user,
+)
 
 
 def test_get_users_superuser_me(superuser_token_headers):

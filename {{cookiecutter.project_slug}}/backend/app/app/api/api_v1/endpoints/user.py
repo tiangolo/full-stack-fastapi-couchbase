@@ -155,26 +155,19 @@ def route_users_username_dbid_get(username):
 @doc(description="Create new user without the need to be logged in", tags=["users"])
 @app.route(f"{config.API_V1_STR}/users/open", methods=["POST"])
 @use_kwargs(
-    {
-        "username": fields.Str(required=True),
-        "password": fields.Str(required=True),
-    }
+    {"username": fields.Str(required=True), "password": fields.Str(required=True)}
 )
 @marshal_with(UserSchema())
-def route_users_post_open(
-    username=None, password=None,
-):
+def route_users_post_open(username=None, password=None):
     if not config.USERS_OPEN_REGISTRATION:
         abort(403, "Open user resgistration is forbidden on this server")
     client = get_client()
     db_users = get_db_users(client)
-   
+
     user = get_user(username, db_users, client)
 
     if user:
-        return abort(
-            400, f"The user with this username already exists in the system"
-        )
+        return abort(400, f"The user with this username already exists in the system")
 
     user = create_user_with_default_db(username, password, db_users, client)
     return user

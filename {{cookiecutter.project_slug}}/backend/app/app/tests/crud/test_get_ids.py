@@ -1,7 +1,4 @@
-from app.db.utils import (
-    get_user_id,
-    get_database_id_for_user,
-)
+from app.db.utils import get_user_id, get_database_id_for_user
 
 
 def test_get_user_id():
