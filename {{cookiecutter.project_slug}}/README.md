@@ -450,16 +450,16 @@ Traefik UI: http://{{cookiecutter.domain_dev}}:8080
 
 ## Updating, re-generating
 
-This project was generated using https://github.com/tiangolo/full-stack with:
+This project was generated using https://github.com/tiangolo/full-stack-flask-couchdb with:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack
+cookiecutter https://github.com/tiangolo/full-stack-flask-couchdb
 ```
 
 You can generate the project again with the same configurations used the first time.
 
-That would be useful if, for example, the project generator (`tiangolo/full-stack`) was updated and you want to integrate or review the changes.
+That would be useful if, for example, the project generator (`tiangolo/full-stack-flask-couchdb`) was updated and you want to integrate or review the changes.
 
 You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code and being able to use your current variables.
 
@@ -470,7 +470,7 @@ You can use that file while generating a new project to reuse all those variable
 For example, run:
 
 ```bash
-cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack
+cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack-flask-couchdb
 ```
 
 That will use the file `cookiecutter-config-file.yml` in the current directory (in this project) to generate a new project inside a sibling directory `project-copy`.
