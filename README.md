@@ -108,3 +108,4 @@ After using this generator, the new project will contain an extensive `README.md
 ## License
 
 This project is licensed under the terms of the MIT license.
+
