@@ -9,6 +9,7 @@ default_context:
   secret_key: '{{ cookiecutter.secret_key }}'
   first_superuser: '{{ cookiecutter.first_superuser }}'
   first_superuser_password: '{{ cookiecutter.first_superuser_password }}'
+  backend_cors_origins: '{{ cookiecutter.backend_cors_origins }}'
   couchdb_user: '{{ cookiecutter.couchdb_user }}'
   couchdb_password: '{{ cookiecutter.couchdb_password }}'
   couchdb_cors_origins: '{{ cookiecutter.couchdb_cors_origins }}'
