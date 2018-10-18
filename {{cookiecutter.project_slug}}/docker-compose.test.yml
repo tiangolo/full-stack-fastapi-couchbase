@@ -10,5 +10,5 @@ services:
       - COUCHDB_SERVER=${COUCHDB_SERVER}
       - COUCHDB_USER=${COUCHDB_USER}
       - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
-      - FIRST_SUPERUSER={{cookiecutter.first_superuser}}
-      - FIRST_SUPERUSER_PASSWORD={{cookiecutter.first_superuser_password}}
+      - FIRST_SUPERUSER=${FIRST_SUPERUSER}
+      - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD}
