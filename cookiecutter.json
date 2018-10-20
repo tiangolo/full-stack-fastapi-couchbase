@@ -10,11 +10,11 @@
     "secret_key": "changethis",
     "first_superuser": "admin@{{cookiecutter.domain_main}}",
     "first_superuser_password": "changethis",
-    "backend_cors_origins": "http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com", 
+    "backend_cors_origins": "http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com, http://localhost.tiangolo.com", 
 
     "couchdb_user": "admin",
     "couchdb_password": "changethis",
-    "couchdb_cors_origins": "http://localhost:5984, http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://db.{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, https://db.{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com, http://local.dockertoolbox.tiangolo.com:5984",
+    "couchdb_cors_origins": "http://localhost:5984, http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://db.{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, https://db.{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com, http://local.dockertoolbox.tiangolo.com:5984, http://localhost.tiangolo.com, http://localhost.tiangolo.com:4984",
 
     "traefik_constraint_tag": "{{cookiecutter.domain_main}}",
     "traefik_constraint_tag_staging": "{{cookiecutter.domain_staging}}",
