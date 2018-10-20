@@ -19,6 +19,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 8  # 60 minutes * 24 hours * 8 days = 8 
 
 SERVER_NAME = os.getenv("SERVER_NAME")
 BACKEND_CORS_ORIGINS = os.getenv("BACKEND_CORS_ORIGINS")
+PROJECT_NAME = os.getenv("PROJECT_NAME")
 SENTRY_DSN = os.getenv("SENTRY_DSN")
 
 COUCHDB_USER = os.getenv("COUCHDB_USER")

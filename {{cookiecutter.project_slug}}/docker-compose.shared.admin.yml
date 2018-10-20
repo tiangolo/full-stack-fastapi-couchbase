@@ -11,4 +11,4 @@ services:
   flower:
     image: totem/celery-flower-docker
     environment:
-      - FLOWER_BASIC_AUTH={{cookiecutter.flower_auth}}
+      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH}
