@@ -1,6 +1,8 @@
-version: '3'
+version: '3.3'
 services:
-  couchdb:
-    image: couchdb:2
+  couchbase:
+    image: couchbase:community-5.1.1
+  sync-gateway:
+    image: couchbase/sync-gateway:2.1.0-community
   queue:
     image: rabbitmq:3

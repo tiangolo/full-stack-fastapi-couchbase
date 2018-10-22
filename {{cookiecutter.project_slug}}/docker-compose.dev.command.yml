@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
   proxy:
     command: --docker \
@@ -8,6 +8,6 @@ services:
       --logLevel=DEBUG \
       --accessLog \
       --web
-  # backend:
-    # command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
+  backend:
+    command: bash -c "while true; do sleep 1; done"  # Infinite loop to keep container live doing nothing
     # command: bash -c "flask run --host=0.0.0.0 --port=80"

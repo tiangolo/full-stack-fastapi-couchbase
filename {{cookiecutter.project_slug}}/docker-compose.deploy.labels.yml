@@ -1,11 +1,11 @@
-version: '3'
+version: '3.3'
 services:
-  couchdb:
+  couchbase:
     deploy:
       labels:
         - traefik.frontend.rule=Host:db.${DOMAIN}
         - traefik.enable=true
-        - traefik.port=5984
+        - traefik.port=8091
         - traefik.tags=${TRAEFIK_PUBLIC_TAG}
         - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}
         # Traefik service that listens to HTTP

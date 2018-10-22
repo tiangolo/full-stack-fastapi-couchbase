@@ -1,8 +1,12 @@
-version: '3'
+version: '3.3'
 services:
-  couchdb:
+  couchbase:
     ports:
-      - '5984:5984'
+      - '8091:8091'
+  sync-gateway:
+    ports:
+      - '4984:4984'
+      - '4985:4985'
   proxy:
     ports:
       - '80:80'

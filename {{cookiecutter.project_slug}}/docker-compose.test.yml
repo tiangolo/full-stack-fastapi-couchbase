@@ -1,4 +1,4 @@
-version: '3'
+version: '3.3'
 services:
   backend-tests:
     build:
@@ -7,8 +7,8 @@ services:
     command: bash -c "while true; do sleep 1; done"
     environment:
       - SERVER_NAME=${DOMAIN}
-      - COUCHDB_SERVER=${COUCHDB_SERVER}
-      - COUCHDB_USER=${COUCHDB_USER}
-      - COUCHDB_PASSWORD=${COUCHDB_PASSWORD}
+      - COUCHBASE_HOST=${COUCHBASE_HOST}
+      - COUCHBASE_USER=${COUCHBASE_USER}
+      - COUCHBASE_PASSWORD=${COUCHBASE_PASSWORD}
       - FIRST_SUPERUSER=${FIRST_SUPERUSER}
       - FIRST_SUPERUSER_PASSWORD=${FIRST_SUPERUSER_PASSWORD}
