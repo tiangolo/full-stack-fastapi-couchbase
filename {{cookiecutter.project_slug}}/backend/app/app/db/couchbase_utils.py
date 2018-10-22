@@ -68,6 +68,15 @@ def setup_default_bucket(base_url, username, password, ram_quota_mb=597):
     return r.status_code == 200
 
 
+def setup_index_storage(base_url, username, password):
+    url = f"{base_url}/settings/indexes"
+    auth = HTTPBasicAuth(username, password)
+    r = requests.post(
+        url, data={"storageMode": "forestdb"}, auth=auth
+    )
+    return r.status_code == 200
+
+
 def ensure_default_bucket_setup(base_url, username, password, ram_quota_mb=597):
     if is_default_bucket_setup(base_url, username, password):
         return True
@@ -129,6 +138,12 @@ def config_couchbase(username, password, host="couchbase", port="8091"):
         cluster_url, COUCHBASE_DEFAULT_USER, COUCHBASE_DEFAULT_PASSWORD
     ) or ensure_default_bucket_setup(cluster_url, username, password)
     logger.info("after ensure_default_bucket_setup")
+
+    logger.info("before setup_index_storage")
+    assert setup_index_storage(
+        cluster_url, COUCHBASE_DEFAULT_USER, COUCHBASE_DEFAULT_PASSWORD
+    ) or setup_index_storage(cluster_url, username, password)
+    logger.info("after setup_index_storage")
 
     logger.info("before ensure_sandbox_username_password")
     assert ensure_couchbase_username_password(cluster_url, username, password)
