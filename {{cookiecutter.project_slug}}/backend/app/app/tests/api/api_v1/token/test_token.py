@@ -30,7 +30,7 @@ def test_use_access_token(superuser_token_headers):
     )
     result = r.json()
     assert r.status_code == 200
-    assert "_id" in result
+    assert "name" in result
 
 
 def test_use_access_token_manual(superuser_token_headers):
@@ -42,4 +42,4 @@ def test_use_access_token_manual(superuser_token_headers):
     )
     result = r.json()
     assert r.status_code == 200
-    assert "_id" in result
+    assert "name" in result
