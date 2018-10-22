@@ -25,7 +25,7 @@ Backend, JSON based web API, with Swagger automatic documentation: http://localh
 
 Swagger UI, frontend user interface to interact with the API live: http://localhost/swagger/
 
-CouchDB, web administration: http://localhost:5984/_utils
+Couchbase, web administration: http://http://localhost:8091
 
 Flower, administration of Celery tasks: http://localhost:5555
 
@@ -52,6 +52,8 @@ If your Docker is not running in `localhost` (the URLs above wouldn't work) chec
 ### General workflow
 
 Modify or add Marshmallow schemas in `./backend/app/app/schemas` and API endpoints in `./backend/app/app/api/`.
+
+To simplify development with documents (with editor support, checks, completion, etc) use and update Pydantic document models in `./backend/app/app/models`.
 
 Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`. 
 
@@ -336,29 +338,29 @@ STACK_NAME={{cookiecutter.docker_swarm_stack_name_staging}} sh ./script-deploy.s
 To use and expand that environment variable inside the `docker-compose.deploy.volumes-placement.yml` files you can add the constraints to the services like:
 
 ```yaml
-version: '3'
+version: '3.3'
 services:
-  couchdb:
+  couchbase:
     volumes:
-      - app-couchdb-data:/opt/couchdb/data
+      - app-couchbase-data:/opt/couchbase/var
     deploy:
       placement:
         constraints:
-          - node.labels.${STACK_NAME}.app-couchdb-data == true
+          - node.labels.${STACK_NAME}.app-couchbase-data == true
 ```
 
 note the `${STACK_NAME}`. In the script `./script-deploy.sh`, that `docker-compose.deploy.volumes-placement.yml` would be converted, and saved to a file `docker-stack.yml` containing:
 
 ```yaml
-version: '3'
+version: '3.3'
 services:
-  couchdb:
+  couchbase:
     volumes:
-      - app-couchdb-data:/opt/couchdb/data
+      - app-couchbase-data:/opt/couchbase/var
     deploy:
       placement:
         constraints:
-          - node.labels.{{cookiecutter.docker_swarm_stack_name_main}}.app-db-data == true
+          - node.labels.{{cookiecutter.docker_swarm_stack_name_main}}.app-couchbase-data == true
 ```
 
 If you add more volumes to your stack, you need to make sure you add the corresponding constraints to the services that use that named volume.
@@ -410,13 +412,13 @@ then chose a node from the list. For example, `dog.example.com`.
 * Add the label to that node. Use as label the name of the stack you are deploying followed by a dot (`.`) followed by the named volume, and as value, just `true`, e.g.:
 
 ```bash
-docker node update --label-add {{cookiecutter.docker_swarm_stack_name_main}}.app-db-data=true dog.example.com
+docker node update --label-add {{cookiecutter.docker_swarm_stack_name_main}}.app-couchbase-data=true dog.example.com
 ```
 
 * Then you need to do the same for each stack version you have. For example, for staging you could do:
 
 ```bash
-docker node update --label-add {{cookiecutter.docker_swarm_stack_name_staging}}.app-db-data=true cat.example.com
+docker node update --label-add {{cookiecutter.docker_swarm_stack_name_staging}}.app-couchbase-data=true cat.example.com
 ```
 
 ### Deploy to a Docker Swarm mode cluster
@@ -523,7 +525,7 @@ Backend: https://{{cookiecutter.domain_main}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_main}}/swagger/
 
-CouchDB: https://db.{{cookiecutter.domain_main}}/_utils
+Couchbase: https://db.{{cookiecutter.domain_main}}/
 
 Flower: https://flower.{{cookiecutter.domain_main}}
 
@@ -537,7 +539,7 @@ Backend: https://{{cookiecutter.domain_staging}}/api/
 
 Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
 
-CouchDB: https://db.{{cookiecutter.domain_staging}}/_utils
+Couchbase: https://db.{{cookiecutter.domain_staging}}/
 
 Flower: https://flower.{{cookiecutter.domain_staging}}
     
@@ -551,7 +553,7 @@ Backend: http://localhost/api/
 
 Swagger UI: http://localhost/swagger/
 
-CouchDB: http://localhost:5984/_utils
+Couchbase: http://localhost:8091/
 
 Flower: http://localhost:5555
 
@@ -567,7 +569,7 @@ Backend: http://local.dockertoolbox.tiangolo.com/api/
 
 Swagger UI: http://local.dockertoolbox.tiangolo.com/swagger/
 
-CouchDB: http://local.dockertoolbox.tiangolo.com:5984/_utils
+Couchbase: http://local.dockertoolbox.tiangolo.com:8091
 
 Flower: http://local.dockertoolbox.tiangolo.com:5555
 
@@ -583,7 +585,7 @@ Backend: http://dev.{{cookiecutter.domain_main}}/api/
 
 Swagger UI: http://dev.{{cookiecutter.domain_main}}/swagger/
 
-CouchDB: http://dev.{{cookiecutter.domain_main}}:5984/_utils
+Couchbase: http://dev.{{cookiecutter.domain_main}}:8091
 
 Flower: http://dev.{{cookiecutter.domain_main}}:5555
 
@@ -599,7 +601,7 @@ Backend: http://localhost.tiangolo.com/api/
 
 Swagger UI: http://localhost.tiangolo.com/swagger/
 
-CouchDB: http://localhost.tiangolo.com:5984/_utils
+Couchbase: http://localhost.tiangolo.com:8091
 
 Flower: http://localhost.tiangolo.com:5555
 
@@ -607,18 +609,18 @@ Traefik UI: http://localhost.tiangolo.com:8090
 
 ## Project generation and updating, or re-generating
 
-This project was generated using https://github.com/tiangolo/full-stack-flask-couchdb with:
+This project was generated using https://github.com/tiangolo/full-stack-flask-couchbase with:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack-flask-couchdb
+cookiecutter https://github.com/tiangolo/full-stack-flask-couchbase
 ```
 
 You can check the variables used during generation in the file `cookiecutter-config-file.yml`.
 
 You can generate the project again with the same configurations used the first time.
 
-That would be useful if, for example, the project generator (`tiangolo/full-stack-flask-couchdb`) was updated and you want to integrate or review the changes.
+That would be useful if, for example, the project generator (`tiangolo/full-stack-flask-couchbase`) was updated and you want to integrate or review the changes.
 
 You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code but being able to use the same variables used for your current project.
 
@@ -629,7 +631,7 @@ You can use that file while generating a new project to reuse all those variable
 For example, run:
 
 ```bash
-cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack-flask-couchdb
+cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack-flask-couchbase
 ```
 
 That will use the file `cookiecutter-config-file.yml` in the current directory (in this project) to generate a new project inside a sibling directory `project-copy`.
