@@ -2,7 +2,6 @@ import logging
 
 from tenacity import retry, stop_after_attempt, wait_fixed, before_log, after_log
 
-from app.db.database import get_client
 from app.tests.api.api_v1.token.test_token import test_get_access_token
 
 logging.basicConfig(level=logging.INFO)
@@ -19,8 +18,8 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init():
-    # Wait for CouchDB to be awake
-    client = get_client()  # noqa
+    # Check Couchbase is awake
+    from app.db.bucket import bucket  # noqa
     # Wait for API to be awake, run one simple tests to authenticate
     test_get_access_token()
 
