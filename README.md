@@ -1,10 +1,10 @@
-# Full Stack Flask CouchDB - project generator
+# Full Stack Flask Couchbase - project generator
 
-[![Build Status](https://travis-ci.org/tiangolo/full-stack-flask-couchdb.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-flask-couchdb)
+[![Build Status](https://travis-ci.org/tiangolo/full-stack-flask-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-flask-couchbase)
 
 Generate a backend and frontend stack using Python, including interactive API documentation.
 
-[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack-flask-couchdb)
+[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack-flask-couchbase)
 
 ## Features
 
@@ -21,7 +21,7 @@ Generate a backend and frontend stack using Python, including interactive API do
   * Basic starting functionality for users and roles (modify and remove as you need)
   * CORS (Cross Origin Resource Sharing)
 * Celery worker that can import and use code from the rest of the backend selectively (you don't have to install the complete app in each worker)
-* NoSQL CouchDB database that supports direct synchronization for offline-first applications
+* NoSQL Couchbase database that supports direct synchronization via Couchbase Sync Gateway for offline-first applications
 * REST backend tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, or whatever you want, and just test that the API works).
 * Easy Python integration with Jupyter Kernels for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
 * Vue frontend:
@@ -49,7 +49,7 @@ Go to the directoy where you want to create your project and run:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack-flask-couchdb
+cookiecutter https://github.com/tiangolo/full-stack-flask-couchbase
 ```
 
 ### Generate passwords
@@ -83,9 +83,9 @@ The input variables, with their default values (some auto generated) are:
 * `first_superuser_password`: First superuser password. Use the method above to generate it.
 * `backend_cors_origins`: Origins (domains, more or less) that are enabled for CORS (Cross Origin Resource Sharing). This allows a frontend in one domain (e.g. `https://dashboard.example.com`) to communicate with this backend, that could be living in another domain (e.g. `https://api.example.com`). It can also be used to allow your local frontend (with a custom `hosts` domain mapping, as described in the project's `README.md`) that could be living in `http://dev.example.com:8080` to cummunicate with the backend at `https://stag.example.com`. Notice the `http` vs `https` and the `dev.` prefix for local development vs the "staging" `stag.` prefix. By default, it includes origins for production, staging and development, with ports commonly used during local development by several popular frontend frameworks (Vue with `:8080`, React, Angular).
  
-* `couchdb_user`: CouchDB main user to be used by the application (code). By default `admin`.
-* `couchdb_password`: Password of the main user, for the backend code. Generate it with the method above.
-* `couchdb_cors_origins`: List of CORS origins that the database should allow to talk to directly. Similar to `backend_cors_origins`.
+* `couchbase_user`: Couchbase main user to be used by the application (code). By default `admin`.
+* `couchbase_password`: Password of the main user, for the backend code. Generate it with the method above.
+* `couchbase_cors_origins`: List of CORS origins that the database should allow to talk to directly. Similar to `backend_cors_origins`.
  
 * `traefik_constraint_tag`: The tag to be used by the internal Traefik load balancer (for example, to divide requests between backend and frontend) for production. Used to separate this stack from any other stack you might have. This should identify each stack in each environment (production, staging, etc).
 * `traefik_constraint_tag_staging`: The Traefik tag to be used while on staging. 
@@ -112,11 +112,6 @@ Read the [**Guide to deploy a Docker Swarm Mode Cluster**](https://github.com/ti
 
 After using this generator, your new project (the directory created) will contain an extensive `README.md` with instructions for development, deployment, etc. You can pre-read [the project `README.md` template here too](./{{cookiecutter.project_slug}}/README.md).
 
-## History
-
-**Note about Angular**: a previous version of this project generated a basic default Angular frontend application, but without any view or interaction with the rest of the stack (the backend API). I recently switched to Vue for frontend and used it to created the basic frontend views for this project (that didn't exist before). If you are interested in keeping the Angular version, let me know in an issue, I can create an Angular version of the project (without the current default views), then you can integrate your Angular app with the basic `Dockerfile` and additional files.
-
 ## License
 
 This project is licensed under the terms of the MIT license.
-
