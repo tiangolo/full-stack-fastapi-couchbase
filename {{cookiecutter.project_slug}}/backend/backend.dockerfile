@@ -1,7 +1,12 @@
 FROM tiangolo/uwsgi-nginx-flask:python3.6
 
+# Dependencies for Couchbase
+RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
+RUN echo "deb http://packages.couchbase.com/ubuntu stretch stretch/main" > /etc/apt/sources.list.d/couchbase.list
+RUN apt-get update && apt-get install -y libcouchbase-dev build-essential
+
 RUN pip install --upgrade pip
-RUN pip install flask flask-cors raven[flask] celery==4.1.1 passlib[bcrypt] flask-apispec flask-jwt-extended cloudant==2.9.0 tenacity
+RUN pip install flask flask-cors raven[flask] celery==4.1.1 passlib[bcrypt] flask-apispec flask-jwt-extended tenacity requests pydantic couchbase
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:

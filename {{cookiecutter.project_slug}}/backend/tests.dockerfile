@@ -1,6 +1,10 @@
 FROM python:3.6
 
-RUN pip install requests pytest tenacity passlib[bcrypt] cloudant==2.9.0
+RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
+RUN echo "deb http://packages.couchbase.com/ubuntu stretch stretch/main" > /etc/apt/sources.list.d/couchbase.list
+RUN apt-get update && apt-get install -y libcouchbase-dev build-essential
+
+RUN pip install requests pytest tenacity passlib[bcrypt] couchbase pydantic
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
