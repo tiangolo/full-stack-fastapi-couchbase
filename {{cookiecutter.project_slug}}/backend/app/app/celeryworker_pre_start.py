@@ -2,8 +2,6 @@ import logging
 
 from tenacity import retry, stop_after_attempt, wait_fixed, before_log, after_log
 
-from app.db.database import get_client
-
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -18,8 +16,8 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init():
-    # Check CouchDB is awake
-    client = get_client()  # noqa
+    # Check Couchbase is awake
+    from app.db.bucket import bucket  # noqa
 
 
 def main():
