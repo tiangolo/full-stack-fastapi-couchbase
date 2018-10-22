@@ -9,9 +9,10 @@ from webargs import fields
 
 # Import app code
 from app.main import app
+from app.db.bucket import bucket
 from ..api_docs import docs, security_params
 from app.core import config
-from app.db.utils import authenticate_user, check_if_user_is_active
+from app.crud.user import authenticate_user, check_if_user_is_active
 
 # Import Schemas
 from app.schemas.token import TokenSchema
@@ -29,7 +30,7 @@ from app.schemas.user import UserSchema
 )
 @marshal_with(TokenSchema())
 def route_login_access_token(username, password):
-    user = authenticate_user(username, password)
+    user = authenticate_user(bucket, username, password)
     if not user:
         abort(400, "Incorrect email or password")
     elif not check_if_user_is_active(user):
@@ -44,8 +45,6 @@ def route_login_access_token(username, password):
 
 
 # OAuth2 compatible token login, get an access token for future requests has a test in test_token
-
-
 @docs.register
 @doc(description="Test access token", tags=["login"], security=security_params)
 @app.route(f"{config.API_V1_STR}/login/test-token", methods=["POST"])
@@ -59,9 +58,6 @@ def route_test_token(test):
     else:
         abort(400, "No user")
     return current_user
-
-
-# Test access token has a test in test_token
 
 
 @docs.register
@@ -88,6 +84,3 @@ def route_manual_test_token(test):
     else:
         abort(400, "No user")
     return current_user
-
-
-# Test access token has a test in test_token
