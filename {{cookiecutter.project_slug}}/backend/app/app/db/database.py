@@ -1,75 +1,35 @@
-# Standard packages
-import atexit
+from couchbase.cluster import Cluster
+from couchbase.cluster import PasswordAuthenticator
+from couchbase.admin import Admin
+from couchbase.exceptions import HTTPError
+from app.db.couchbase_utils import get_cluster_couchbase_url
+# Types
+from couchbase.bucket import Bucket
 
-# Installed packages
-# from cloudant.client import CouchDB
-from app.couchdb_remote.client import RemoteCouchDB
+def ensure_create_bucket(username: str, password: str, bucket_name: str, host="couchbase", port="8091"):
+    adm = Admin(username, password, host=host, port=port)
+    try:
+        adm.bucket_create(bucket_name, bucket_type="couchbase")
+        return True
+    except HTTPError as e:
+        if e.objextra.value["errors"]["name"] == 'Bucket with given name already exists':
+            return True
 
-# App code
-from app.core import config
+def get_bucket(username:str, password: str, bucket_name: str, host="couchbase", port="8091"):
+    # cluster_url="couchbase://couchbase"
+    # username = "Administrator"
+    # password = "password"
+    cluster_url = get_cluster_couchbase_url(host=host, port=port)
+    cluster = Cluster(cluster_url)
+    authenticator = PasswordAuthenticator(username, password)
+    cluster.authenticate(authenticator)
+    bucket = cluster.open_bucket(bucket_name)
+    return bucket
 
+def ensure_create_primary_index(bucket: Bucket):
+    manager = bucket.bucket_manager()
+    return manager.n1ql_index_create_primary(ignore_exists=True)
 
-def get_client():
-    return RemoteCouchDB(
-        config.COUCHDB_USER,
-        config.COUCHDB_PASSWORD,
-        url=config.COUCHDB_URL,
-        connect=True,
-        auto_renew=True,
-        remote=True,
-    )
-
-
-def get_db_app(client=None):
-    if not client:
-        client = get_client()
-    return client.create_database("app")
-
-
-def get_db_users(client=None):
-    if not client:
-        client = get_client()
-    return client.create_database("_users")
-
-
-@atexit.register
-def close_client():
-    client = get_client()
-    client.disconnect()
-
-
-def enable_cors():
-    couch_cors_url = (
-        config.COUCHDB_URL + "/_node/nonode@nohost/_config/httpd/enable_cors"
-    )
-    couch_cors_credentials_url = (
-        config.COUCHDB_URL + "/_node/nonode@nohost/_config/cors/credentials"
-    )
-    couch_cors_origins_url = (
-        config.COUCHDB_URL + "/_node/nonode@nohost/_config/cors/origins"
-    )
-    client = get_client()
-    client.r_session.put(couch_cors_url, json="true")
-    client.r_session.put(couch_cors_credentials_url, json="true")
-    client.r_session.put(couch_cors_origins_url, json=config.COUCHDB_CORS_ORIGINS)
-
-
-def setup_cookie():
-    couch_persistent_cookies_url = (
-        config.COUCHDB_URL
-        + "/_node/nonode@nohost/_config/couch_httpd_auth/allow_persistent_cookies"
-    )
-    couch_timeout_url = (
-        config.COUCHDB_URL + "/_node/nonode@nohost/_config/couch_httpd_auth/timeout"
-    )
-    client = get_client()
-    client.r_session.put(couch_persistent_cookies_url, json="true")
-    res = client.r_session.put(couch_timeout_url, json=str(config.COUCHDB_AUTH_TIMEOUT))
-
-
-def enable_couch_peruser():
-    couch_peruser_url = (
-        config.COUCHDB_URL + "/_node/nonode@nohost/_config/couch_peruser/enable"
-    )
-    client = get_client()
-    client.r_session.put(couch_peruser_url, json="true")
+def ensure_create_type_index(bucket: Bucket):
+    manager = bucket.bucket_manager()
+    return manager.n1ql_index_create("idx_type", ignore_exists=True, fields=["type"])
