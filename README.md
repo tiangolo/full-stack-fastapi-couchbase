@@ -85,7 +85,9 @@ The input variables, with their default values (some auto generated) are:
  
 * `couchbase_user`: Couchbase main user to be used by the application (code). By default `admin`.
 * `couchbase_password`: Password of the main user, for the backend code. Generate it with the method above.
-* `couchbase_cors_origins`: List of CORS origins that the database should allow to talk to directly. Similar to `backend_cors_origins`.
+* `couchbase_sync_gateway_cors`: List of CORS origins that the Sync Gateway should allow to talk to directly. Similar to `backend_cors_origins`.
+* `couchbase_sync_gateway_user`: User to be created for the Couchbase Sync Gateway. This is what allows synchronization using the CouchDB protocol, with Couchbase Lite in mobile apps and PouchDB in the web and hybrid mobile apps.
+* `couchbase_sync_gateway_password`: Couchbase Sync Gateway password. Generate it with the method above.
  
 * `traefik_constraint_tag`: The tag to be used by the internal Traefik load balancer (for example, to divide requests between backend and frontend) for production. Used to separate this stack from any other stack you might have. This should identify each stack in each environment (production, staging, etc).
 * `traefik_constraint_tag_staging`: The Traefik tag to be used while on staging. 
@@ -101,6 +103,7 @@ The input variables, with their default values (some auto generated) are:
 * `docker_image_backend`: Docker image name for the backend. By default, it will be based on your Docker image prefix, e.g.: `git.example.com/development-team/my-awesome-project/backend`. And depending on your environment, a different tag will be appended ( `prod`, `stag`, `branch` ). So, the final image names used will be like: `git.example.com/development-team/my-awesome-project/backend:prod`.
 * `docker_image_celeryworker`: Docker image for the celery worker. By default, based on your Docker image prefix.
 * `docker_image_frontend`: Docker image for the frontend. By default, based on your Docker image prefix.
+* `docker_image_sync_gateway`: Docker image for the Sync Gateway. By default, based on your Docker image prefix.
 
 ## How to deploy
 
