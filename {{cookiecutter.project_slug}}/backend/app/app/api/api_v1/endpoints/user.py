@@ -14,7 +14,13 @@ from app.main import app
 from app.db.bucket import bucket
 from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
-from app.crud.user import check_if_user_is_active, check_if_user_is_superuser, get_user, get_users, create_user
+from app.crud.user import (
+    check_if_user_is_active,
+    check_if_user_is_superuser,
+    get_user,
+    get_users,
+    create_or_get_user,
+)
 
 
 # Import Schemas
@@ -62,7 +68,7 @@ def route_users_post(username=None, password=None):
     user = get_user(bucket, username)
     if user:
         return abort(400, f"The user with this username already exists in the system.")
-    user = create_user(bucket, username, password, email=username)
+    user = create_or_get_user(bucket, username, password, email=username)
     return user
 
 
@@ -78,6 +84,7 @@ def route_users_me_get():
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
     return current_user
+
 
 @docs.register
 @doc(
@@ -115,5 +122,5 @@ def route_users_post_open(username=None, password=None):
     user = get_user(bucket, username)
     if user:
         return abort(400, f"The user with this username already exists in the system")
-    user = create_user(bucket, username, password, email=username)
+    user = create_or_get_user(bucket, username, password, email=username)
     return user
