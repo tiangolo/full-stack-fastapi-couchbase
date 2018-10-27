@@ -7,3 +7,7 @@ services:
     depends_on: 
       - couchbase
       - queue
+  sync-gateway:
+    depends_on:
+      - couchbase
+      - backend

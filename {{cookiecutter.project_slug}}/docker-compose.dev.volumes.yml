@@ -9,3 +9,6 @@ services:
   backend-tests:
     volumes:
       - ./backend/app:/app
+  sync-gateway:
+    volumes:
+      - ./sync-gateway/sync:/sync

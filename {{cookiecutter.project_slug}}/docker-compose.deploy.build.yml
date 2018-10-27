@@ -13,3 +13,7 @@ services:
       context: ./frontend
       args:
           FRONTEND_ENV: ${FRONTEND_ENV-production}
+  sync-gateway:
+    build:
+      context: ./sync-gateway
+      dockerfile: Dockerfile

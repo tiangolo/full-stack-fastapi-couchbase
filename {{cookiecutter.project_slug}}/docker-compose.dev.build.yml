@@ -23,3 +23,7 @@ services:
       context: ./frontend
       args: 
         FRONTEND_ENV: dev
+  sync-gateway:
+    build:
+      context: ./sync-gateway
+      dockerfile: Dockerfile

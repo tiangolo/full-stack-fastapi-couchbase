@@ -6,3 +6,5 @@ services:
     image: '${DOCKER_IMAGE_CELERYWORKER}:${TAG-latest}'
   frontend:
     image: '${DOCKER_IMAGE_FRONTEND}:${TAG-latest}'
+  sync-gateway:
+    image: '${DOCKER_IMAGE_SYNC_GATEWAY}:${TAG-latest}'
