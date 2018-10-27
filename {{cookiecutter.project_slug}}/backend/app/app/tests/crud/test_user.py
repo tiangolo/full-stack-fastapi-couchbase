@@ -2,7 +2,7 @@
 from app.tests.utils.utils import random_lower_string
 from app.db.bucket import bucket
 from app.crud.user import (
-    create_user,
+    upsert_user,
     create_or_get_user,
     authenticate_user,
     check_if_user_is_active,
@@ -15,7 +15,7 @@ from app.models.role import RoleEnum
 def test_create_user():
     email = random_lower_string()
     password = random_lower_string()
-    user = create_user(bucket, email, password)
+    user = upsert_user(bucket, email, password)
     assert hasattr(user, "name")
     assert user.name == email
     assert hasattr(user, "password")
