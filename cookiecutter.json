@@ -14,7 +14,10 @@
 
     "couchbase_user": "admin",
     "couchbase_password": "changethis",
-    "couchbase_cors_origins": "http://localhost:4984, http://localhost:4985, http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://db.{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, https://db.{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com, http://local.dockertoolbox.tiangolo.com:4984, http://localhost.tiangolo.com, http://localhost.tiangolo.com:4984",
+
+    "couchbase_sync_gateway_cors": "http://localhost:4984, http://localhost:4985, http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.{{cookiecutter.domain_main}}, https://{{cookiecutter.domain_staging}}, https://db.{{cookiecutter.domain_staging}}, https://{{cookiecutter.domain_main}}, https://db.{{cookiecutter.domain_main}}, http://local.dockertoolbox.tiangolo.com, http://local.dockertoolbox.tiangolo.com:4984, http://localhost.tiangolo.com, http://localhost.tiangolo.com:4984",
+    "couchbase_sync_gateway_user": "sync",
+    "couchbase_sync_gateway_password": "changethis",
 
     "traefik_constraint_tag": "{{cookiecutter.domain_main}}",
     "traefik_constraint_tag_staging": "{{cookiecutter.domain_staging}}",
@@ -30,6 +33,7 @@
     "docker_image_backend": "{{cookiecutter.docker_image_prefix}}backend",
     "docker_image_celeryworker": "{{cookiecutter.docker_image_prefix}}celeryworker",
     "docker_image_frontend": "{{cookiecutter.docker_image_prefix}}frontend",
+    "docker_image_sync_gateway": "{{cookiecutter.docker_image_prefix}}sync-gateway",
 
     "_copy_without_render": [
         "frontend/src/**/*.html",
