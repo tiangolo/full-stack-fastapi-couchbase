@@ -1,7 +1,5 @@
 import logging
 
-from couchbase.auth_domain import AuthDomain
-
 from app.core.config import (
     COUCHBASE_PASSWORD,
     COUCHBASE_USER,
@@ -20,10 +18,10 @@ from app.db.database import (
     ensure_create_primary_index,
     ensure_create_type_index,
     ensure_create_couchbase_app_user,
-    get_cluster,
 )
 from app.crud.user import upsert_user
 from app.models.role import RoleEnum
+from app.models.user import UserInCreate
 
 
 def init_db():
@@ -70,12 +68,15 @@ def init_db():
     )
     logging.info("after ensure_create_couchbase_app_user sync")
     logging.info("before upsert_user first superuser")
-    upsert_user(
-        bucket,
-        FIRST_SUPERUSER,
-        FIRST_SUPERUSER_PASSWORD,
+    in_user = UserInCreate(
+        name=FIRST_SUPERUSER,
+        password=FIRST_SUPERUSER_PASSWORD,
         email=FIRST_SUPERUSER,
         admin_roles=[RoleEnum.superuser, RoleEnum.admin],
         admin_channels=[FIRST_SUPERUSER, RoleEnum.admin],
+    )
+    upsert_user(
+        bucket,
+        in_user
     )
     logging.info("after upsert_user first superuser")
