@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library modules
 
 # Import installed modules
@@ -14,12 +12,14 @@ from app.main import app
 from app.db.bucket import bucket
 from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
+from app.models.user import UserInCreate, UserInUpdate, UserStored
 from app.crud.user import (
     check_if_user_is_active,
-    check_if_user_is_superuser,
+    check_if_user_is_admin_or_superuser,
     get_user,
     get_users,
-    create_or_get_user,
+    upsert_user,
+    update_user,
 )
 
 
@@ -42,8 +42,8 @@ def route_users_get(skip=0, limit=100):
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    elif not check_if_user_is_superuser(current_user):
-        abort(400, "Not a superuser")
+    elif not check_if_user_is_admin_or_superuser(current_user):
+        abort(400, "The user doesn't have enough privileges")
     users = get_users(bucket, skip=skip, limit=limit)
     return users
 
@@ -52,23 +52,137 @@ def route_users_get(skip=0, limit=100):
 @doc(description="Create new user", security=security_params, tags=["users"])
 @app.route(f"{config.API_V1_STR}/users/", methods=["POST"])
 @use_kwargs(
-    {"username": fields.Str(required=True), "password": fields.Str(required=True)}
+    {
+        "name": fields.Str(required=True),
+        "password": fields.Str(required=True),
+        "admin_channels": fields.List(fields.Str()),
+        "admin_roles": fields.List(fields.Str()),
+        "disabled": fields.Boolean(),
+        "email": fields.Str(),
+        "human_name": fields.Str(),
+    }
 )
 @marshal_with(UserSchema())
 @jwt_required
-def route_users_post(username=None, password=None):
+def route_users_post(
+    *,
+    name,
+    password,
+    admin_channels=[],
+    admin_roles=[],
+    disabled=False,
+    email=None,
+    human_name=None,
+):
     current_user = get_current_user()
 
     if not current_user:
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    elif not check_if_user_is_superuser(current_user):
-        abort(400, "Not a superuser")
-    user = get_user(bucket, username)
+    elif not check_if_user_is_admin_or_superuser(current_user):
+        abort(400, "The user doesn't have enough privileges")
+    user = get_user(bucket, name)
     if user:
         return abort(400, f"The user with this username already exists in the system.")
-    user = create_or_get_user(bucket, username, password, email=username)
+    user_in = UserInCreate(
+        name=name,
+        password=password,
+        admin_channels=admin_channels,
+        admin_roles=admin_roles,
+        disabled=disabled,
+        email=email,
+        human_name=human_name,
+    )
+    user = upsert_user(bucket, user_in)
+    return user
+
+
+@docs.register
+@doc(description="Update a user", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/<name>", methods=["PUT"])
+@use_kwargs(
+    {
+        "password": fields.Str(),
+        "admin_channels": fields.List(fields.Str()),
+        "admin_roles": fields.List(fields.Str()),
+        "disabled": fields.Boolean(),
+        "email": fields.Str(),
+        "human_name": fields.Str(),
+    }
+)
+@marshal_with(UserSchema())
+@jwt_required
+def route_users_put(
+    *,
+    name,
+    password=None,
+    admin_channels=None,
+    admin_roles=None,
+    disabled=None,
+    email=None,
+    human_name=None,
+):
+    current_user = get_current_user()
+
+    if not current_user:
+        abort(400, "Could not authenticate user with provided token")
+    elif not check_if_user_is_active(current_user):
+        abort(400, "Inactive user")
+    elif not check_if_user_is_admin_or_superuser(current_user):
+        abort(400, "The user doesn't have enough privileges")
+    user = get_user(bucket, name)
+
+    if not user:
+        return abort(404, f"The user with this username does not exist in the system.")
+    user_in = UserInUpdate(
+        name=name,
+        password=password,
+        admin_channels=admin_channels,
+        admin_roles=admin_roles,
+        disabled=disabled,
+        email=email,
+        human_name=human_name,
+    )
+    user = update_user(bucket, user_in)
+    return user
+
+
+@docs.register
+@doc(description="Update own user", security=security_params, tags=["users"])
+@app.route(f"{config.API_V1_STR}/users/me", methods=["PUT"])
+@use_kwargs(
+    {
+        "password": fields.Str(),
+        "human_name": fields.Str(),
+        "email": fields.Str(),
+    }
+)
+@marshal_with(UserSchema())
+@jwt_required
+def route_users_me_put(
+    *,
+    password=None,
+    human_name=None,
+    email=None,
+):
+    current_user: UserStored = get_current_user()
+
+    if not current_user:
+        abort(400, "Could not authenticate user with provided token")
+    elif not check_if_user_is_active(current_user):
+        abort(400, "Inactive user")
+    user_in = UserInUpdate(
+        **current_user.json_dict()
+    )
+    if password is not None:
+        user_in.password = password
+    if human_name is not None:
+        user_in.human_name = human_name
+    if email is not None:
+        user_in.email = email
+    
+    user = update_user(bucket, user_in)
     return user
 
 
@@ -92,20 +206,20 @@ def route_users_me_get():
     security=security_params,
     tags=["users"],
 )
-@app.route(f"{config.API_V1_STR}/users/<string:username>", methods=["GET"])
+@app.route(f"{config.API_V1_STR}/users/<name>", methods=["GET"])
 @marshal_with(UserSchema())
 @jwt_required
-def route_users_id_get(username):
+def route_users_id_get(name):
     current_user = get_current_user()  # type: User
     if not current_user:
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    user = get_user(bucket, username)
+    user = get_user(bucket, name)
     if user == current_user:
         return user
-    if not check_if_user_is_superuser(current_user):
-        abort(400, "Not a superuser")
+    if not check_if_user_is_admin_or_superuser(current_user):
+        abort(400, "The user doesn't have enough privileges")
     return user
 
 
@@ -113,14 +227,20 @@ def route_users_id_get(username):
 @doc(description="Create new user without the need to be logged in", tags=["users"])
 @app.route(f"{config.API_V1_STR}/users/open", methods=["POST"])
 @use_kwargs(
-    {"username": fields.Str(required=True), "password": fields.Str(required=True)}
+    {
+        "name": fields.Str(required=True),
+        "password": fields.Str(required=True),
+        "email": fields.Str(),
+        "human_name": fields.Str(),
+    }
 )
 @marshal_with(UserSchema())
-def route_users_post_open(username=None, password=None):
+def route_users_post_open(*, name, password, email=None, human_name=None):
     if not config.USERS_OPEN_REGISTRATION:
         abort(403, "Open user resgistration is forbidden on this server")
-    user = get_user(bucket, username)
+    user = get_user(bucket, name)
     if user:
         return abort(400, f"The user with this username already exists in the system")
-    user = create_or_get_user(bucket, username, password, email=username)
+    user_in = UserInCreate(name=name, password=password, email=email, human_name=human_name)
+    user = upsert_user(bucket, user_in)
     return user
