@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { actionCheckLoggedIn } from '@/store';
+import { actionCheckLoggedIn } from '@/store/constants';
 
 @Component
 export default class App extends Vue {
