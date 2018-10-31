@@ -71,9 +71,7 @@ def setup_default_bucket(base_url, username, password, ram_quota_mb=597):
 def setup_index_storage(base_url, username, password):
     url = f"{base_url}/settings/indexes"
     auth = HTTPBasicAuth(username, password)
-    r = requests.post(
-        url, data={"storageMode": "forestdb"}, auth=auth
-    )
+    r = requests.post(url, data={"storageMode": "forestdb"}, auth=auth)
     return r.status_code == 200
 
 

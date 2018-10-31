@@ -20,6 +20,7 @@ wait_seconds = 1
 def init():
     # Check Couchbase is awake
     from app.db.bucket import bucket  # noqa
+
     # Wait for API to be awake, run one simple tests to authenticate
     test_get_access_token()
 

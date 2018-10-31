@@ -1,9 +1,7 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library packages
 
 # Import installed packages
-from marshmallow import Schema, fields
+from marshmallow import Schema
 
 # Import app code
 
