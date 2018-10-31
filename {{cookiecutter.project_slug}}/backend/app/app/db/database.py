@@ -1,3 +1,5 @@
+
+from couchbase import LOCKMODE_WAIT
 from couchbase.cluster import Cluster
 from couchbase.cluster import PasswordAuthenticator
 from couchbase.admin import Admin
@@ -28,7 +30,6 @@ def ensure_create_bucket(
         ):
             return True
 
-
 def get_cluster(username: str, password: str, host="couchbase", port="8091"):
     # cluster_url="couchbase://couchbase"
     # username = "Administrator"
@@ -44,7 +45,7 @@ def get_bucket(
     username: str, password: str, bucket_name: str, host="couchbase", port="8091"
 ):
     cluster = get_cluster(username, password, host=host, port=port)
-    bucket: Bucket = cluster.open_bucket(bucket_name)
+    bucket: Bucket = cluster.open_bucket(bucket_name, lockmode=LOCKMODE_WAIT)
     return bucket
 
 
