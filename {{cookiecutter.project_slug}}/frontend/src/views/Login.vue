@@ -32,15 +32,14 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { checkIsLoggedIn, saveToken } from '@/utils';
 import { api } from '@/api';
-import store, {
+import {
   setToken,
   setLoggedIn,
   actionLogIn,
   actionCheckLoggedIn,
   actionLogOut,
-} from '@/store';
+} from '@/store/constants';
 import { appName } from '@/env';
 
 @Component
@@ -48,26 +47,6 @@ export default class Login extends Vue {
   public email: string = '';
   public password: string = '';
   public appName = appName;
-
-  public beforeRouteEnter(to, from, next) {
-    if (store.state.isLoggedIn === false) {
-      next();
-    } else {
-      next('/');
-    }
-  }
-
-  public beforeRouteUpdate(to, from, next) {
-    if (store.state.isLoggedIn === false) {
-      next();
-    } else {
-      next('/');
-    }
-  }
-
-  public checkLogin() {
-    this.$store.dispatch(actionCheckLoggedIn);
-  }
 
   public submit() {
     this.$store.dispatch(actionLogIn, {
