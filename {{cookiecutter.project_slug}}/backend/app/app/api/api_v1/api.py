@@ -9,3 +9,4 @@ from .api_docs import docs
 from .endpoints import token
 from .endpoints import user
 from .endpoints import utils
+from .endpoints import role
