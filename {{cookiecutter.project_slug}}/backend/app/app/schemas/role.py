@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library packages
 
 # Import installed packages
@@ -9,6 +7,6 @@ from marshmallow import fields
 from .base import BaseSchema
 
 
-class RoleSchema(BaseSchema):
+class RolesSchema(BaseSchema):
     # Own properties
-    name = fields.Str()
+    roles = fields.List(fields.Str())

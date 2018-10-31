@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Import standard library packages
 
 # Import installed packages
@@ -10,8 +8,6 @@ from .base import BaseSchema
 
 
 class UserSchema(BaseSchema):
-    # Own properties
-    type = fields.Str()
     name = fields.Str()
     human_name = fields.Str()
     email = fields.Str()
