@@ -5,7 +5,7 @@ export const getters: GetterTree<State, {}> = {
     hasAdminAccess: (state) => {
         return (
             state.userProfile &&
-            state.userProfile.admin_roles.includes('admin') &&
-            state.userProfile.admin_roles.includes('superuser'));
+            (state.userProfile.admin_roles.includes('admin') ||
+            state.userProfile.admin_roles.includes('superuser')));
     },
 };
