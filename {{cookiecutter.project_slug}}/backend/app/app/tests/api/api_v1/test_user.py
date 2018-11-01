@@ -38,7 +38,6 @@ def test_create_user_new_email(superuser_token_headers):
     created_user = r.json()
     user = get_user(bucket, username)
     assert user.name == created_user["name"]
-    assert user.type == created_user["type"]
 
 
 def test_get_existing_user(superuser_token_headers):
@@ -55,7 +54,6 @@ def test_get_existing_user(superuser_token_headers):
     api_user = r.json()
     user = get_user(bucket, username)
     assert user.name == api_user["name"]
-    assert user.type == api_user["type"]
 
 
 def test_create_user_existing_username(superuser_token_headers):
@@ -111,4 +109,3 @@ def test_retrieve_users(superuser_token_headers):
     for user in all_users:
         assert "name" in user
         assert "admin_roles" in user
-        assert "type" in user
