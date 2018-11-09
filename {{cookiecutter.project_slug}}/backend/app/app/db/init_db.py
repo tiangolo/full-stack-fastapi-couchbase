@@ -10,14 +10,18 @@ from app.core.config import (
     FIRST_SUPERUSER_PASSWORD,
     COUCHBASE_SYNC_GATEWAY_USER,
     COUCHBASE_SYNC_GATEWAY_PASSWORD,
+    COUCHBASE_MEMORY_QUOTA_MB,
 )
-from app.db.couchbase_utils import config_couchbase
-from app.db.database import (
+from app.db.couchbase_utils import (
+    config_couchbase,
     ensure_create_bucket,
+    get_cluster_http_url,
+    ensure_create_couchbase_user,
+)
+from app.db.database import (
     get_bucket,
     ensure_create_primary_index,
     ensure_create_type_index,
-    ensure_create_couchbase_app_user,
 )
 from app.crud.user import upsert_user
 from app.models.role import RoleEnum
@@ -25,20 +29,21 @@ from app.models.user import UserInCreate
 
 
 def init_db():
+    cluster_url = get_cluster_http_url(host=COUCHBASE_HOST, port=COUCHBASE_PORT)
     logging.info("before config_couchbase")
     config_couchbase(
-        COUCHBASE_USER, COUCHBASE_PASSWORD, host=COUCHBASE_HOST, port=COUCHBASE_PORT
+        username=COUCHBASE_USER, password=COUCHBASE_PASSWORD, host=COUCHBASE_HOST, port=COUCHBASE_PORT
     )
     logging.info("after config_couchbase")
     # COUCHBASE_USER="Administrator"
     # COUCHBASE_PASSWORD="password"
     logging.info("before ensure_create_bucket")
     ensure_create_bucket(
-        COUCHBASE_USER,
-        COUCHBASE_PASSWORD,
-        COUCHBASE_BUCKET_NAME,
-        host=COUCHBASE_HOST,
-        port=COUCHBASE_PORT,
+        cluster_url=cluster_url,
+        username=COUCHBASE_USER,
+        password=COUCHBASE_PASSWORD,
+        bucket_name=COUCHBASE_BUCKET_NAME,
+        ram_quota_mb=COUCHBASE_MEMORY_QUOTA_MB,
     )
     logging.info("after ensure_create_bucket")
     logging.info("before get_bucket")
@@ -57,14 +62,12 @@ def init_db():
     ensure_create_type_index(bucket)
     logging.info("after ensure_create_type_index")
     logging.info("before ensure_create_couchbase_app_user sync")
-    ensure_create_couchbase_app_user(
-        COUCHBASE_USER,
-        COUCHBASE_PASSWORD,
-        COUCHBASE_SYNC_GATEWAY_USER,
-        COUCHBASE_SYNC_GATEWAY_PASSWORD,
-        COUCHBASE_BUCKET_NAME,
-        host=COUCHBASE_HOST,
-        port=COUCHBASE_PORT,
+    ensure_create_couchbase_user(
+        cluster_url=cluster_url,
+        username=COUCHBASE_USER,
+        password=COUCHBASE_PASSWORD,
+        new_user_id=COUCHBASE_SYNC_GATEWAY_USER,
+        new_user_password=COUCHBASE_SYNC_GATEWAY_PASSWORD,
     )
     logging.info("after ensure_create_couchbase_app_user sync")
     logging.info("before upsert_user first superuser")
@@ -75,8 +78,5 @@ def init_db():
         admin_roles=[RoleEnum.superuser, RoleEnum.admin],
         admin_channels=[FIRST_SUPERUSER, RoleEnum.admin],
     )
-    upsert_user(
-        bucket,
-        in_user
-    )
+    upsert_user(bucket, in_user)
     logging.info("after upsert_user first superuser")
