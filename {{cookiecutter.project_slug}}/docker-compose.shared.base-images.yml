@@ -1,6 +1,6 @@
 version: '3.3'
 services:
   couchbase:
-    image: couchbase:community-5.1.1
+    image: couchbase:community-6.0.0
   queue:
     image: rabbitmq:3

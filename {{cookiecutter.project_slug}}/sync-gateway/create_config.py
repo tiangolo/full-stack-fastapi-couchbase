@@ -32,8 +32,8 @@ COUCHBASE_SYNC_GATEWAY_DATABASE = os.getenv("COUCHBASE_SYNC_GATEWAY_DATABASE", "
 COUCHBASE_SYNC_GATEWAY_CORS_ORIGINS = os.getenv(
     "COUCHBASE_SYNC_GATEWAY_CORS_ORIGINS", ""
 )
-COUCHBASE_SYNC_GATEWAY_USE_VIEWS = getenv_boolean(
-    "COUCHBASE_SYNC_GATEWAY_USE_VIEWS", default_value=True
+COUCHBASE_SYNC_GATEWAY_NUM_INDEX_REPLICAS = int(
+    os.getenv("COUCHBASE_SYNC_GATEWAY_NUM_INDEX_REPLICAS", "0")
 )
 COUCHBASE_SYNC_GATEWAY_DISABLE_GUEST_USER = getenv_boolean(
     "COUCHBASE_SYNC_GATEWAY_DISABLE_GUEST_USER", default_value=False
@@ -43,7 +43,7 @@ COUCHBASE_SYNC_GATEWAY_DISABLE_GUEST_USER = getenv_boolean(
 logging.info("Generating base config")
 config_dict = {
     "interface": ":4984",
-    "log": [COUCHBASE_SYNC_GATEWAY_LOG],
+    "logging": {"console": {"log_keys": [COUCHBASE_SYNC_GATEWAY_LOG]}},
     "databases": {},
 }
 
@@ -80,7 +80,7 @@ if COUCHBASE_HOST and COUCHBASE_SYNC_GATEWAY_USER and COUCHBASE_SYNC_GATEWAY_PAS
         "bucket": COUCHBASE_BUCKET_NAME,
         "username": COUCHBASE_SYNC_GATEWAY_USER,
         "password": COUCHBASE_SYNC_GATEWAY_PASSWORD,
-        "use_views": COUCHBASE_SYNC_GATEWAY_USE_VIEWS,
+        "num_index_replicas": COUCHBASE_SYNC_GATEWAY_NUM_INDEX_REPLICAS,
         "enable_shared_bucket_access": True,
         "import_docs": "continuous",
         "users": {"GUEST": {"disabled": COUCHBASE_SYNC_GATEWAY_DISABLE_GUEST_USER}},

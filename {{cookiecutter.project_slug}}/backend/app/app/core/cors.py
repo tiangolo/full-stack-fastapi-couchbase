@@ -1,6 +1,3 @@
-# Import standard library modules
-import re
-
 # Import installed packages
 from flask_cors import CORS
 

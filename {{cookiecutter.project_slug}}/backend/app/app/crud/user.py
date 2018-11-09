@@ -18,9 +18,6 @@ from app.models.role import RoleEnum
 from app.models.config import USERPROFILE_DOC_TYPE
 from app.crud.utils import get_all_documents_by_type, ensure_enums_to_strs
 
-# Types
-from typing import Sequence, Mapping, List, Union  # noqa
-
 
 def get_user_doc_id(name):
     return f"userprofile::{name}"
@@ -78,9 +75,9 @@ def upsert_user_in_db(bucket: Bucket, user_in: UserInCreate):
 def update_user_in_db(bucket: Bucket, user_in: UserInUpdate):
     stored_user = get_user(bucket, user_in.name)
     for field in stored_user.fields:
-        print('stored field', field)
+        print("stored field", field)
         if field in user_in.fields:
-            print('input field', field)
+            print("input field", field)
             value_in = getattr(user_in, field)
             if value_in is not None:
                 setattr(stored_user, field, value_in)
