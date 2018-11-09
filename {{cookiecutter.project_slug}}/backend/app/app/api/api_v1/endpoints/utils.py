@@ -1,5 +1,5 @@
-# Import installed modules
 # Import installed packages
+from flask import abort
 from webargs import fields
 from flask_apispec import doc, use_kwargs, marshal_with
 from flask_jwt_extended import get_current_user, jwt_required

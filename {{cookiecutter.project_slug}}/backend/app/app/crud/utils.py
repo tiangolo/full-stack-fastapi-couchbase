@@ -1,5 +1,5 @@
 from couchbase.bucket import Bucket
-from couchbase.n1ql import N1QLQuery, N1QLRequest
+from couchbase.n1ql import N1QLQuery
 
 from app.core.config import COUCHBASE_BUCKET_NAME
 
