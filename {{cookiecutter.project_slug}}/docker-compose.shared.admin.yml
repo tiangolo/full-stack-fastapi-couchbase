@@ -10,5 +10,6 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
   flower:
     image: totem/celery-flower-docker
-    environment:
-      - FLOWER_BASIC_AUTH=${FLOWER_BASIC_AUTH}
+    env_file:
+      - env-flower.env
+
