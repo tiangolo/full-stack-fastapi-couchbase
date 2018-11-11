@@ -27,16 +27,16 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
 import { actionUpdateUserProfile } from '@/store/constants';
 import { IUserProfileUpdate } from '@/interfaces';
 
 @Component
 export default class UserProfileEdit extends Vue {
   public valid = true;
-  public fullName: string = "";
-  public email: string = "";
+  public fullName: string = '';
+  public email: string = '';
 
   public created() {
     if (this.$store.state.userProfile) {
@@ -70,7 +70,7 @@ export default class UserProfileEdit extends Vue {
         updatedProfile.email = this.email;
       }
       await this.$store.dispatch(actionUpdateUserProfile, updatedProfile);
-      this.$router.push("/main/profile");
+      this.$router.push('/main/profile');
     }
   }
 }

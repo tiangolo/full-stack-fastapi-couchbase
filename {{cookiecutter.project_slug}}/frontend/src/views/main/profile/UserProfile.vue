@@ -30,8 +30,8 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
 
 @Component
 export default class UserProfile extends Vue {
@@ -40,11 +40,11 @@ export default class UserProfile extends Vue {
   }
 
   public goToEdit() {
-    this.$router.push("/main/profile/edit");
+    this.$router.push('/main/profile/edit');
   }
 
   public goToPassword() {
-    this.$router.push("/main/profile/password");
+    this.$router.push('/main/profile/password');
   }
 }
 </script>

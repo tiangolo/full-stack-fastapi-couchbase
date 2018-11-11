@@ -118,18 +118,18 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
+import { Vue, Component } from 'vue-property-decorator';
 
-import { appName } from "@/env";
+import { appName } from '@/env';
 import {
   setDashboardMiniDrawer,
   setDashboardShowDrawer,
-  actionLogOut
-} from "@/store/constants";
+  actionLogOut,
+} from '@/store/constants';
 
 const routeGuardMain = async (to, from, next) => {
-  if (to.path === "/main") {
-    next("/main/dashboard");
+  if (to.path === '/main') {
+    next('/main/dashboard');
   } else {
     next();
   }
@@ -158,14 +158,14 @@ export default class Main extends Vue {
   public switchShowDrawer() {
     this.$store.commit(
       setDashboardShowDrawer,
-      !this.$store.state.dashboardShowDrawer
+      !this.$store.state.dashboardShowDrawer,
     );
   }
 
   public switchMiniDrawer() {
     this.$store.commit(
       setDashboardMiniDrawer,
-      !this.$store.state.dashboardMiniDrawer
+      !this.$store.state.dashboardMiniDrawer,
     );
   }
 

@@ -30,52 +30,52 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
-import { actionGetUsers } from "@/store/constants";
-import { IUserProfile } from "@/interfaces";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
+import { actionGetUsers } from '@/store/constants';
+import { IUserProfile } from '@/interfaces';
 
 @Component
 export default class UserProfile extends Vue {
   public headers = [
     {
-      text: "Name",
+      text: 'Name',
       sortable: true,
-      value: "name",
-      align: "left"
+      value: 'name',
+      align: 'left',
     },
     {
-      text: "Email",
+      text: 'Email',
       sortable: true,
-      value: "email",
-      align: "left"
+      value: 'email',
+      align: 'left',
     },
     {
-      text: "Full Name",
+      text: 'Full Name',
       sortable: true,
-      value: "human_name",
-      align: "left"
+      value: 'human_name',
+      align: 'left',
     },
     {
-      text: "Disabled",
+      text: 'Disabled',
       sortable: true,
-      value: "disabled",
-      align: "left"
+      value: 'disabled',
+      align: 'left',
     },
     {
-      text: "Roles",
-      value: "admin_roles",
-      align: "left"
+      text: 'Roles',
+      value: 'admin_roles',
+      align: 'left',
     },
     {
-      text: "Actions",
-      value: "name"
-    }
+      text: 'Actions',
+      value: 'name',
+    },
   ];
   get users() {
     return this.$store.state.admin.users.map((user: IUserProfile) => {
       const mappedUser = {
-        ...user
+        ...user,
       };
       return mappedUser;
     });

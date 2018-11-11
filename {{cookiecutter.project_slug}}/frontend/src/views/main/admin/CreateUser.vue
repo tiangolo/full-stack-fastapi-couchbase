@@ -35,28 +35,28 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
+import { Component, Vue } from 'vue-property-decorator';
 import {
   IUserProfile,
   IUserProfileUpdate,
-  IUserProfileCreate
-} from "@/interfaces";
+  IUserProfileCreate,
+} from '@/interfaces';
 import {
   actionGetUsers,
   actionUpdateUser,
   actionGetRoles,
-  actionCreateUser
-} from "@/store/constants";
+  actionCreateUser,
+} from '@/store/constants';
 
 @Component
 export default class EditUser extends Vue {
   public valid = false;
-  public name: string = "";
-  public fullName: string = "";
-  public email: string = "";
+  public name: string = '';
+  public fullName: string = '';
+  public email: string = '';
   public setPassword = false;
-  public password1: string = "";
-  public password2: string = "";
+  public password1: string = '';
+  public password2: string = '';
   public userDisabled: boolean = false;
 
   public selectedRoles: { [role: string]: boolean } = {};
@@ -68,14 +68,14 @@ export default class EditUser extends Vue {
   }
 
   public reset() {
-    this.password1 = "";
-    this.password2 = "";
-    this.name = "";
-    this.fullName = "";
-    this.email = "";
+    this.password1 = '';
+    this.password2 = '';
+    this.name = '';
+    this.fullName = '';
+    this.email = '';
     this.userDisabled = false;
     this.$validator.reset();
-    this.availableRoles.forEach(value => {
+    this.availableRoles.forEach((value) => {
       Vue.set(this.selectedRoles, value, false);
     });
   }
@@ -87,7 +87,7 @@ export default class EditUser extends Vue {
   public async submit() {
     if (await this.$validator.validateAll()) {
       const updatedProfile: IUserProfileCreate = {
-        name: this.name
+        name: this.name,
       };
       if (this.fullName) {
         updatedProfile.human_name = this.fullName;
@@ -104,7 +104,7 @@ export default class EditUser extends Vue {
       });
       updatedProfile.password = this.password1;
       await this.$store.dispatch(actionCreateUser, updatedProfile);
-      this.$router.push("/main/admin/users");
+      this.$router.push('/main/admin/users');
     }
   }
 

@@ -44,23 +44,23 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { IUserProfile, IUserProfileUpdate } from "@/interfaces";
+import { Component, Vue } from 'vue-property-decorator';
+import { IUserProfile, IUserProfileUpdate } from '@/interfaces';
 import {
   actionGetUsers,
   actionUpdateUser,
-  actionGetRoles
-} from "@/store/constants";
+  actionGetRoles,
+} from '@/store/constants';
 
 @Component
 export default class EditUser extends Vue {
   public valid = true;
-  public name: string = "";
-  public fullName: string = "";
-  public email: string = "";
+  public name: string = '';
+  public fullName: string = '';
+  public email: string = '';
   public setPassword = false;
-  public password1: string = "";
-  public password2: string = "";
+  public password1: string = '';
+  public password2: string = '';
   public userDisabled: boolean = false;
 
   public selectedRoles: { [role: string]: boolean } = {};
@@ -68,7 +68,7 @@ export default class EditUser extends Vue {
   public async mounted() {
     await this.$store.dispatch(actionGetUsers);
     await this.$store.dispatch(actionGetRoles);
-    this.availableRoles.forEach(value => {
+    this.availableRoles.forEach((value) => {
       Vue.set(this.selectedRoles, value, false);
     });
     this.reset();
@@ -119,7 +119,7 @@ export default class EditUser extends Vue {
       }
       const payload = { name: this.name, user: updatedProfile };
       await this.$store.dispatch(actionUpdateUser, payload);
-      this.$router.push("/main/admin/users");
+      this.$router.push('/main/admin/users');
     }
   }
 
@@ -127,7 +127,7 @@ export default class EditUser extends Vue {
     const filteredUsers: IUserProfile[] = this.$store.state.admin.users.filter(
       (user: IUserProfile) => {
         return user.name === this.$router.currentRoute.params.name;
-      }
+      },
     );
     if (filteredUsers.length > 0) {
       return { ...filteredUsers[0] };

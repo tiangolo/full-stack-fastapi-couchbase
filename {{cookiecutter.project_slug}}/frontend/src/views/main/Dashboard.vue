@@ -15,14 +15,14 @@
 </template>
 
 <script lang="ts">
-import { Component, Vue } from "vue-property-decorator";
-import { Store } from "vuex";
-import { State } from "@/store";
+import { Component, Vue } from 'vue-property-decorator';
+import { Store } from 'vuex';
+import { State } from '@/store';
 
 @Component
 export default class Dashboard extends Vue {
   get greetedUser() {
-    if(this.$store.state.userProfile.human_name) {
+    if (this.$store.state.userProfile.human_name) {
       return this.$store.state.userProfile.human_name;
     } else {
       return this.$store.state.userProfile.name;
