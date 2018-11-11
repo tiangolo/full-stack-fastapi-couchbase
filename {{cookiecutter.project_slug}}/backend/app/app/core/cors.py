@@ -7,8 +7,6 @@ from app.core import config
 
 origins = []
 
-print(config.BACKEND_CORS_ORIGINS)
-
 # Set all CORS enabled origins
 if config.BACKEND_CORS_ORIGINS:
     origins_raw = config.BACKEND_CORS_ORIGINS.split(",")

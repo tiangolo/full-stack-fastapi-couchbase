@@ -1,6 +1,3 @@
-# Standard module packages
-import logging
-
 # Installed packages
 from couchbase.bucket import Bucket
 import requests
@@ -28,7 +25,6 @@ def get_user(bucket: Bucket, name: str):
     result = bucket.get(doc_id, quiet=True)
     if not result.value:
         return None
-    print(result.value)
     user = UserStored(**result.value)
     user.Meta.key = result.key
     return user
@@ -40,10 +36,6 @@ def upsert_sync_gateway_user(user: UserSyncIn):
 
     data = user.json_dict()
     response = requests.put(url, json=data)
-    print(response)
-    print(response.text)
-    logging.info(response)
-    logging.info(response.text)
     return response.status_code == 200 or response.status_code == 201
 
 
@@ -55,10 +47,6 @@ def update_sync_gateway_user(user: UserSyncIn):
     else:
         data = user.json_dict(exclude=set(["password"]))
     response = requests.put(url, json=data)
-    print(response)
-    print(response.text)
-    logging.info(response)
-    logging.info(response.text)
     return response.status_code == 200 or response.status_code == 201
 
 
@@ -75,9 +63,7 @@ def upsert_user_in_db(bucket: Bucket, user_in: UserInCreate):
 def update_user_in_db(bucket: Bucket, user_in: UserInUpdate):
     stored_user = get_user(bucket, user_in.name)
     for field in stored_user.fields:
-        print("stored field", field)
         if field in user_in.fields:
-            print("input field", field)
             value_in = getattr(user_in, field)
             if value_in is not None:
                 setattr(stored_user, field, value_in)
