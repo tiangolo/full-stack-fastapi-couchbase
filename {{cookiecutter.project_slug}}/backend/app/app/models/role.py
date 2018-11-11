@@ -5,4 +5,4 @@ from enum import Enum
 
 class RoleEnum(Enum):
     superuser = ROLE_SUPERUSER
-    admin = "admin"
+

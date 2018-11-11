@@ -14,7 +14,6 @@ from app.models.role import RoleEnum
 from app.crud.utils import ensure_enums_to_strs
 from app.crud.user import (
     check_if_user_is_active,
-    check_if_user_is_admin,
     check_if_user_is_superuser,
 )
 
@@ -34,7 +33,7 @@ def route_roles_get():
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
     elif not (
-        check_if_user_is_admin(current_user) or check_if_user_is_superuser(current_user)
+        check_if_user_is_superuser(current_user)
     ):
         abort(400, "The current user does not have enogh privileges")
     roles = ensure_enums_to_strs(RoleEnum)

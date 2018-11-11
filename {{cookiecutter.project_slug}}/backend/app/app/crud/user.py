@@ -120,14 +120,6 @@ def check_if_user_is_superuser(user: UserStored):
     return RoleEnum.superuser.value in ensure_enums_to_strs(user.admin_roles)
 
 
-def check_if_user_is_admin(user: UserStored):
-    return RoleEnum.admin.value in ensure_enums_to_strs(user.admin_roles)
-
-
-def check_if_user_is_admin_or_superuser(user: UserStored):
-    return check_if_user_is_admin(user) or check_if_user_is_superuser(user)
-
-
 def get_users(bucket: Bucket, *, skip=0, limit=100):
     doc_results = get_all_documents_by_type(
         bucket, doc_type=USERPROFILE_DOC_TYPE, skip=skip, limit=limit

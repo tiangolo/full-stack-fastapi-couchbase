@@ -15,7 +15,7 @@ from app.core import config
 from app.models.user import UserInCreate, UserInUpdate, UserStored
 from app.crud.user import (
     check_if_user_is_active,
-    check_if_user_is_admin_or_superuser,
+    check_if_user_is_superuser,
     get_user,
     get_users,
     upsert_user,
@@ -42,7 +42,7 @@ def route_users_get(skip=0, limit=100):
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    elif not check_if_user_is_admin_or_superuser(current_user):
+    elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
     users = get_users(bucket, skip=skip, limit=limit)
     return users
@@ -80,7 +80,7 @@ def route_users_post(
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    elif not check_if_user_is_admin_or_superuser(current_user):
+    elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
     user = get_user(bucket, name)
     if user:
@@ -129,7 +129,7 @@ def route_users_put(
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    elif not check_if_user_is_admin_or_superuser(current_user):
+    elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
     user = get_user(bucket, name)
 
@@ -218,7 +218,7 @@ def route_users_id_get(name):
     user = get_user(bucket, name)
     if user == current_user:
         return user
-    if not check_if_user_is_admin_or_superuser(current_user):
+    if not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
     return user
 

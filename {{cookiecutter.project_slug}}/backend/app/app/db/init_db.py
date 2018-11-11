@@ -75,8 +75,8 @@ def init_db():
         name=FIRST_SUPERUSER,
         password=FIRST_SUPERUSER_PASSWORD,
         email=FIRST_SUPERUSER,
-        admin_roles=[RoleEnum.superuser, RoleEnum.admin],
-        admin_channels=[FIRST_SUPERUSER, RoleEnum.admin],
+        admin_roles=[RoleEnum.superuser],
+        admin_channels=[FIRST_SUPERUSER],
     )
     upsert_user(bucket, in_user)
     logging.info("after upsert_user first superuser")
