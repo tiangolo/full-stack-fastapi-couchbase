@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { dispatchCheckLoggedIn, readIsLoggedIn } from '@/store';
+import { dispatchCheckLoggedIn, readIsLoggedIn } from '@/store/accessors';
 
 @Component
 export default class App extends Vue {

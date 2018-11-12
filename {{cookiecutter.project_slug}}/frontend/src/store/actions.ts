@@ -3,7 +3,6 @@ import { saveLocalToken, getLocalToken, removeLocalToken } from '@/utils';
 import router from '@/router';
 import { ActionContext } from 'vuex';
 import {
-    State,
     commitSetToken,
     commitSetLoggedIn,
     commitSetLogInError,
@@ -17,9 +16,10 @@ import {
     commitSetUsers,
     commitSetUser,
     commitSetRoles,
-} from '.';
+} from './accessors';
 import { AxiosError } from 'axios';
 import { IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
+import { State } from '.';
 
 type MainContext = ActionContext<State, State>;
 

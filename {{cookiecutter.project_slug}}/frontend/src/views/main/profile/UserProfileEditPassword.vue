@@ -52,7 +52,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { IUserProfileUpdate } from '@/interfaces';
-import { dispatchUpdateUserProfile, readUserProfile } from '@/store';
+import { dispatchUpdateUserProfile, readUserProfile } from '@/store/accessors';
 
 @Component
 export default class UserProfileEdit extends Vue {

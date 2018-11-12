@@ -17,7 +17,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { State, readUserProfile } from '@/store';
+import { readUserProfile } from '@/store/accessors';
 
 @Component
 export default class Dashboard extends Vue {

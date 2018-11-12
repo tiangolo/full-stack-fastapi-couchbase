@@ -52,7 +52,7 @@ import {
   dispatchUpdateUser,
   readAdminOneUser,
 readAdminRoles,
-} from '@/store';
+} from '@/store/accessors';
 
 @Component
 export default class EditUser extends Vue {

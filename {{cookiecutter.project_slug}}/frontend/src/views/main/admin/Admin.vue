@@ -4,7 +4,8 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { store, dispatchGetRoles } from '@/store';
+import { store } from '@/store';
+import { dispatchGetRoles } from '@/store/accessors';
 
 const routeGuardAdmin = async (to, from, next) => {
   if (!store.getters.hasAdminAccess) {

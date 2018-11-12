@@ -126,8 +126,8 @@ import {
   readDashboardShowDrawer,
   commitSetDashboardMiniDrawer,
   readDashboardMiniDrawer,
-dispatchLogOut,
-} from '@/store';
+  dispatchLogOut,
+} from '@/store/accessors';
 
 const routeGuardMain = async (to, from, next) => {
   if (to.path === '/main') {

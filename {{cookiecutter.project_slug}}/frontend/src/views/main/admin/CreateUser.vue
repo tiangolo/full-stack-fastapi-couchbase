@@ -41,7 +41,7 @@ import {
   IUserProfileUpdate,
   IUserProfileCreate,
 } from '@/interfaces';
-import { dispatchGetUsers, dispatchGetRoles, dispatchCreateUser, readAdminRoles } from '@/store';
+import { dispatchGetUsers, dispatchGetRoles, dispatchCreateUser, readAdminRoles } from '@/store/accessors';
 
 @Component
 export default class EditUser extends Vue {
