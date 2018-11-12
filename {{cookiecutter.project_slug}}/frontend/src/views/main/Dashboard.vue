@@ -17,15 +17,18 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { State } from '@/store';
+import { State, readUserProfile } from '@/store';
 
 @Component
 export default class Dashboard extends Vue {
   get greetedUser() {
-    if (this.$store.state.userProfile.human_name) {
-      return this.$store.state.userProfile.human_name;
-    } else {
-      return this.$store.state.userProfile.name;
+    const userProfile = readUserProfile(this.$store);
+    if (userProfile && userProfile.human_name) {
+      if (userProfile.human_name) {
+        return userProfile.human_name;
+      } else {
+        return userProfile.name;
+      }
     }
   }
 }

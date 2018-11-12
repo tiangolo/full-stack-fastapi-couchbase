@@ -51,8 +51,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { actionUpdateUserProfile } from '@/store/constants';
 import { IUserProfileUpdate } from '@/interfaces';
+import { dispatchUpdateUserProfile, readUserProfile } from '@/store';
 
 @Component
 export default class UserProfileEdit extends Vue {
@@ -61,7 +61,7 @@ export default class UserProfileEdit extends Vue {
   public password2 = '';
 
   get userProfile() {
-    return this.$store.state.userProfile;
+    return readUserProfile(this.$store);
   }
 
   public reset() {
@@ -78,7 +78,7 @@ export default class UserProfileEdit extends Vue {
     if (await this.$validator.validateAll()) {
       const updatedProfile: IUserProfileUpdate = {};
       updatedProfile.password = this.password1;
-      await this.$store.dispatch(actionUpdateUserProfile, updatedProfile);
+      await dispatchUpdateUserProfile(this.$store, updatedProfile);
       this.$router.push('/main/profile');
     }
   }

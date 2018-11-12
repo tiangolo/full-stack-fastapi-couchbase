@@ -47,10 +47,12 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { IUserProfile, IUserProfileUpdate } from '@/interfaces';
 import {
-  actionGetUsers,
-  actionUpdateUser,
-  actionGetRoles,
-} from '@/store/constants';
+  dispatchGetUsers,
+  dispatchGetRoles,
+  dispatchUpdateUser,
+  readAdminOneUser,
+readAdminRoles,
+} from '@/store';
 
 @Component
 export default class EditUser extends Vue {
@@ -66,8 +68,8 @@ export default class EditUser extends Vue {
   public selectedRoles: { [role: string]: boolean } = {};
 
   public async mounted() {
-    await this.$store.dispatch(actionGetUsers);
-    await this.$store.dispatch(actionGetRoles);
+    await dispatchGetUsers(this.$store);
+    await dispatchGetRoles(this.$store);
     this.availableRoles.forEach((value) => {
       Vue.set(this.selectedRoles, value, false);
     });
@@ -118,24 +120,17 @@ export default class EditUser extends Vue {
         updatedProfile.password = this.password1;
       }
       const payload = { name: this.name, user: updatedProfile };
-      await this.$store.dispatch(actionUpdateUser, payload);
+      await dispatchUpdateUser(this.$store, payload);
       this.$router.push('/main/admin/users');
     }
   }
 
   get user() {
-    const filteredUsers: IUserProfile[] = this.$store.state.admin.users.filter(
-      (user: IUserProfile) => {
-        return user.name === this.$router.currentRoute.params.name;
-      },
-    );
-    if (filteredUsers.length > 0) {
-      return { ...filteredUsers[0] };
-    }
+    return readAdminOneUser(this.$store)(this.$router.currentRoute.params.name);
   }
 
   get availableRoles() {
-    return [...this.$store.state.admin.roles];
+    return readAdminRoles(this.$store);
   }
 }
 </script>

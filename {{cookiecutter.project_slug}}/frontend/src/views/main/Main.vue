@@ -1,6 +1,6 @@
 <template>
   <div>
-    <v-navigation-drawer persistent :mini-variant="$store.state.dashboardMiniDrawer" v-model="showDrawer" fixed app>
+    <v-navigation-drawer persistent :mini-variant="miniDrawer" v-model="showDrawer" fixed app>
       <v-layout column fill-height>
         <v-list>
           <v-subheader>Main menu</v-subheader>
@@ -70,7 +70,7 @@
           <v-divider></v-divider>
           <v-list-tile @click="switchMiniDrawer">
             <v-list-tile-action>
-              <v-icon v-html="$store.state.dashboardMiniDrawer ? 'chevron_right' : 'chevron_left'"></v-icon>
+              <v-icon v-html="miniDrawer ? 'chevron_right' : 'chevron_left'"></v-icon>
             </v-list-tile-action>
             <v-list-tile-content>
               <v-list-tile-title>Collapse</v-list-tile-title>
@@ -122,10 +122,12 @@ import { Vue, Component } from 'vue-property-decorator';
 
 import { appName } from '@/env';
 import {
-  setDashboardMiniDrawer,
-  setDashboardShowDrawer,
-  actionLogOut,
-} from '@/store/constants';
+  commitSetDashboardShowDrawer,
+  readDashboardShowDrawer,
+  commitSetDashboardMiniDrawer,
+  readDashboardMiniDrawer,
+dispatchLogOut,
+} from '@/store';
 
 const routeGuardMain = async (to, from, next) => {
   if (to.path === '/main') {
@@ -147,30 +149,34 @@ export default class Main extends Vue {
     routeGuardMain(to, from, next);
   }
 
+  get miniDrawer() {
+    return readDashboardMiniDrawer(this.$store);
+  }
+
   get showDrawer() {
-    return this.$store.state.dashboardShowDrawer;
+    return readDashboardShowDrawer(this.$store);
   }
 
   set showDrawer(value) {
-    this.$store.commit(setDashboardShowDrawer, value);
+    commitSetDashboardShowDrawer(this.$store, value);
   }
 
   public switchShowDrawer() {
-    this.$store.commit(
-      setDashboardShowDrawer,
-      !this.$store.state.dashboardShowDrawer,
+    commitSetDashboardShowDrawer(
+      this.$store,
+      !readDashboardShowDrawer(this.$store),
     );
   }
 
   public switchMiniDrawer() {
-    this.$store.commit(
-      setDashboardMiniDrawer,
-      !this.$store.state.dashboardMiniDrawer,
+    commitSetDashboardMiniDrawer(
+      this.$store,
+      !readDashboardMiniDrawer(this.$store),
     );
   }
 
-  public logout() {
-    this.$store.dispatch(actionLogOut);
+  public async logout() {
+    await dispatchLogOut(this.$store);
   }
 }
 </script>

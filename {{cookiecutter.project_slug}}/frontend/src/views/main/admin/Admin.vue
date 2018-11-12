@@ -4,8 +4,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { store } from '@/store';
-import { actionGetRoles } from '@/store/constants';
+import { store, dispatchGetRoles } from '@/store';
 
 const routeGuardAdmin = async (to, from, next) => {
   if (!store.getters.hasAdminAccess) {
@@ -26,7 +25,7 @@ export default class Start extends Vue {
   }
 
   public async mounted() {
-    await this.$store.dispatch(actionGetRoles);
+    await dispatchGetRoles(this.$store);
   }
 }
 </script>

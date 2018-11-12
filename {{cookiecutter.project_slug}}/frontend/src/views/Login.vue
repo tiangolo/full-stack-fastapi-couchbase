@@ -13,8 +13,8 @@
                 <v-text-field @keyup.enter="submit" v-model="email" prepend-icon="person" name="login" label="Login" type="text"></v-text-field>
                 <v-text-field @keyup.enter="submit" v-model="password" prepend-icon="lock" name="password" label="Password" id="password" type="password"></v-text-field>
               </v-form>
-              <div v-if="$store.state.logInError">
-                <v-alert :value="$store.state.logInError" transition="fade-transition" type="error">
+              <div v-if="loginError">
+                <v-alert :value="loginError" transition="fade-transition" type="error">
                   Incorrect email or password
                 </v-alert>
               </div>
@@ -33,14 +33,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { api } from '@/api';
-import {
-  setToken,
-  setLoggedIn,
-  actionLogIn,
-  actionCheckLoggedIn,
-  actionLogOut,
-} from '@/store/constants';
 import { appName } from '@/env';
+import { readLoginError, dispatchLogIn } from '@/store';
 
 @Component
 export default class Login extends Vue {
@@ -48,11 +42,12 @@ export default class Login extends Vue {
   public password: string = '';
   public appName = appName;
 
+  public get loginError() {
+    return readLoginError(this.$store);
+  }
+
   public submit() {
-    this.$store.dispatch(actionLogIn, {
-      username: this.email,
-      password: this.password,
-    });
+    dispatchLogIn(this.$store, {username: this.email, password: this.password});
   }
 }
 </script>

@@ -41,12 +41,7 @@ import {
   IUserProfileUpdate,
   IUserProfileCreate,
 } from '@/interfaces';
-import {
-  actionGetUsers,
-  actionUpdateUser,
-  actionGetRoles,
-  actionCreateUser,
-} from '@/store/constants';
+import { dispatchGetUsers, dispatchGetRoles, dispatchCreateUser, readAdminRoles } from '@/store';
 
 @Component
 export default class EditUser extends Vue {
@@ -62,8 +57,8 @@ export default class EditUser extends Vue {
   public selectedRoles: { [role: string]: boolean } = {};
 
   public async mounted() {
-    await this.$store.dispatch(actionGetUsers);
-    await this.$store.dispatch(actionGetRoles);
+    await dispatchGetUsers(this.$store);
+    await dispatchGetRoles(this.$store);
     this.reset();
   }
 
@@ -103,13 +98,13 @@ export default class EditUser extends Vue {
         }
       });
       updatedProfile.password = this.password1;
-      await this.$store.dispatch(actionCreateUser, updatedProfile);
+      await dispatchCreateUser(this.$store, updatedProfile);
       this.$router.push('/main/admin/users');
     }
   }
 
   get availableRoles() {
-    return [...this.$store.state.admin.roles];
+    return readAdminRoles(this.$store);
   }
 }
 </script>

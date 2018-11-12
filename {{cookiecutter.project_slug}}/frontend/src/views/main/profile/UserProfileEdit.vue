@@ -29,8 +29,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { actionUpdateUserProfile } from '@/store/constants';
 import { IUserProfileUpdate } from '@/interfaces';
+import { dispatchUpdateUserProfile, readUserProfile } from '@/store';
 
 @Component
 export default class UserProfileEdit extends Vue {
@@ -39,20 +39,22 @@ export default class UserProfileEdit extends Vue {
   public email: string = '';
 
   public created() {
-    if (this.$store.state.userProfile) {
-      this.fullName = this.$store.state.userProfile.human_name;
-      this.email = this.$store.state.userProfile.email;
+    const userProfile = readUserProfile(this.$store);
+    if (userProfile) {
+      this.fullName = userProfile.human_name;
+      this.email = userProfile.email;
     }
   }
 
   get userProfile() {
-    return this.$store.state.userProfile;
+    return readUserProfile(this.$store);
   }
 
   public reset() {
-    if (this.$store.state.userProfile) {
-      this.fullName = this.$store.state.userProfile.human_name;
-      this.email = this.$store.state.userProfile.email;
+    const userProfile = readUserProfile(this.$store);
+    if (userProfile) {
+      this.fullName = userProfile.human_name;
+      this.email = userProfile.email;
     }
   }
 
@@ -69,7 +71,7 @@ export default class UserProfileEdit extends Vue {
       if (this.email) {
         updatedProfile.email = this.email;
       }
-      await this.$store.dispatch(actionUpdateUserProfile, updatedProfile);
+      await dispatchUpdateUserProfile(this.$store, updatedProfile);
       this.$router.push('/main/profile');
     }
   }

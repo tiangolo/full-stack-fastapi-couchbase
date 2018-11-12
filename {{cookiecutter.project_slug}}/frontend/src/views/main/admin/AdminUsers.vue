@@ -32,8 +32,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { actionGetUsers } from '@/store/constants';
 import { IUserProfile } from '@/interfaces';
+import { dispatchGetUsers, readAdminUsers } from '@/store';
 
 @Component
 export default class UserProfile extends Vue {
@@ -73,16 +73,11 @@ export default class UserProfile extends Vue {
     },
   ];
   get users() {
-    return this.$store.state.admin.users.map((user: IUserProfile) => {
-      const mappedUser = {
-        ...user,
-      };
-      return mappedUser;
-    });
+    return readAdminUsers(this.$store);
   }
 
   public async mounted() {
-    await this.$store.dispatch(actionGetUsers);
+    await dispatchGetUsers(this.$store);
   }
 }
 </script>

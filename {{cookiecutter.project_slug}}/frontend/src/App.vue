@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <v-app>
-      <v-content v-if="$store.state.isLoggedIn===null">
+      <v-content v-if="loggedIn===null">
         <v-container fill-height>
           <v-layout align-center justify-center>
             <v-flex>
@@ -20,13 +20,17 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { actionCheckLoggedIn } from '@/store/constants';
+import { dispatchCheckLoggedIn, readIsLoggedIn } from '@/store';
 
 @Component
 export default class App extends Vue {
 
-  public created() {
-    this.$store.dispatch(actionCheckLoggedIn);
+  get loggedIn() {
+    return readIsLoggedIn(this.$store);
+  }
+
+  public async created() {
+    await dispatchCheckLoggedIn(this.$store);
   }
 }
 </script>

@@ -32,11 +32,12 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
+import { readUserProfile } from '@/store';
 
 @Component
 export default class UserProfile extends Vue {
   get userProfile() {
-    return this.$store.state.userProfile;
+    return readUserProfile(this.$store);
   }
 
   public goToEdit() {
