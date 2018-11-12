@@ -1,152 +1,147 @@
-import {
-    actionLogIn,
-    setToken,
-    setLoggedIn,
-    setLogInError,
-    actionGetUserProfile,
-    actionRouteLoggedIn,
-    actionLogOut,
-    setUserProfile,
-    actionUpdateUserProfile,
-    actionCheckLoggedIn,
-    actionRemoveLogIn,
-    actionRouteLogOut,
-    actionGetUsers,
-    actionCheckApiError,
-    setUsers,
-    actionUpdateUser,
-    setUser,
-    actionGetRoles,
-    setRoles,
-    actionCreateUser,
-} from './constants';
 import { api } from '@/api';
 import { saveLocalToken, getLocalToken, removeLocalToken } from '@/utils';
 import router from '@/router';
-import { ActionTree } from 'vuex';
-import { State } from '.';
+import { ActionContext } from 'vuex';
+import {
+    State,
+    commitSetToken,
+    commitSetLoggedIn,
+    commitSetLogInError,
+    dispatchGetUserProfile,
+    dispatchRouteLoggedIn,
+    dispatchLogOut,
+    commitSetUserProfile,
+    dispatchCheckApiError,
+    dispatchRemoveLogIn,
+    dispatchRouteLogOut,
+    commitSetUsers,
+    commitSetUser,
+    commitSetRoles,
+} from '.';
 import { AxiosError } from 'axios';
 import { IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
 
-export const actions: ActionTree<State, {}> = {
-    [actionLogIn]: async (context, payload) => {
+type MainContext = ActionContext<State, State>;
+
+export const actions = {
+    async actionLogIn(context: MainContext, payload: { username: string; password: string }) {
         try {
             const response = await api.logInGetToken(payload.username, payload.password);
             const token = response.data.access_token;
             if (token) {
                 saveLocalToken(token);
-                context.commit(setToken, token);
-                context.commit(setLoggedIn, true);
-                context.commit(setLogInError, false);
-                await context.dispatch(actionGetUserProfile);
-                await context.dispatch(actionRouteLoggedIn);
+                commitSetToken(context, token);
+                commitSetLoggedIn(context, true);
+                commitSetLogInError(context, false);
+                await dispatchGetUserProfile(context);
+                await dispatchRouteLoggedIn(context);
             } else {
-                await context.dispatch(actionLogOut);
+                await dispatchLogOut(context);
             }
         } catch (err) {
-            context.commit(setLogInError, true);
-            await context.dispatch(actionLogOut);
+            commitSetLogInError(context, true);
+            await dispatchLogOut(context);
         }
     },
-    [actionGetUserProfile]: async (context) => {
+    async actionGetUserProfile(context: MainContext) {
         try {
             const response = await api.getMe(context.state.token);
             if (response.data) {
-                context.commit(setUserProfile, response.data);
+                commitSetUserProfile(context, response.data);
             }
         } catch (error) {
-            await context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
-    [actionUpdateUserProfile]: async (context, payload) => {
+    async actionUpdateUserProfile(context: MainContext, payload) {
         try {
             const response = await api.updateMe(context.state.token, payload);
             if (response.data) {
-                context.commit(setUserProfile, response.data);
+                commitSetUserProfile(context, response.data);
             }
         } catch (error) {
-            await context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
-    [actionCheckLoggedIn]: async (context) => {
+    async actionCheckLoggedIn(context: MainContext) {
         if (!context.state.isLoggedIn) {
             let token = context.state.token;
             if (!token) {
                 const localToken = getLocalToken();
                 if (localToken) {
-                    context.commit(setToken, localToken);
+                    commitSetToken(context, localToken);
                     token = localToken;
                 }
             }
             if (token) {
                 try {
                     const response = await api.getMe(token);
-                    context.commit(setLoggedIn, true);
-                    context.commit(setUserProfile, response.data);
+                    commitSetLoggedIn(context, true);
+                    commitSetUserProfile(context, response.data);
                 } catch (error) {
-                    await context.dispatch(actionRemoveLogIn);
+                    await dispatchRemoveLogIn(context);
                 }
             } else {
-                await context.dispatch(actionRemoveLogIn);
+                await dispatchRemoveLogIn(context);
             }
         }
     },
-    [actionRemoveLogIn]: async (context) => {
+    async actionRemoveLogIn(context: MainContext) {
         removeLocalToken();
-        context.commit(setToken, '');
-        context.commit(setLoggedIn, false);
+        commitSetToken(context, '');
+        commitSetLoggedIn(context, false);
     },
-    [actionLogOut]: async (context) => {
-        await context.dispatch(actionRemoveLogIn);
-        await context.dispatch(actionRouteLogOut);
+    async actionLogOut(context: MainContext) {
+        await dispatchRemoveLogIn(context);
+        await dispatchRouteLogOut(context);
     },
-    [actionRouteLogOut]: (context) => {
+    actionRouteLogOut(context: MainContext) {
         if (router.currentRoute.path !== '/login') {
             router.push('/login');
         }
     },
-    [actionCheckApiError]: async (context, payload: AxiosError) => {
+    async actionCheckApiError(context: MainContext, payload: AxiosError) {
         if (payload.response!.status === 401) {
-            await context.dispatch(actionLogOut);
+            await dispatchLogOut(context);
         }
     },
-    [actionRouteLoggedIn]: (context) => {
+    actionRouteLoggedIn(context: MainContext) {
         if (router.currentRoute.path === '/login' || router.currentRoute.path === '/') {
             router.push('/main');
         }
     },
-    [actionGetUsers]: async (context) => {
+    async actionGetUsers(context: MainContext) {
         try {
             const response = await api.getUsers(context.state.token);
             if (response) {
-                context.commit(setUsers, response.data);
+                commitSetUsers(context, response.data);
             }
         } catch (error) {
-            await context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
-    [actionUpdateUser]: async (context, payload: {name: string, user: IUserProfileUpdate}) => {
+    async actionUpdateUser(context: MainContext, payload: { name: string, user: IUserProfileUpdate }) {
         try {
             const response = await api.updateUser(context.state.token, payload.name, payload.user);
-            context.commit(setUser, response.data);
+            commitSetUser(context, response.data);
         } catch (error) {
-            context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
-    [actionCreateUser]: async (context, payload: IUserProfileCreate) => {
+    async actionCreateUser(context: MainContext, payload: IUserProfileCreate) {
         try {
             const response = await api.createUser(context.state.token, payload);
-            context.commit(setUser, response.data);
+            commitSetUser(context, response.data);
         } catch (error) {
-            context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
-    [actionGetRoles]: async (context) => {
+    async actionGetRoles(context: MainContext) {
         try {
             const response = await api.getRoles(context.state.token);
-            context.commit(setRoles, response.data.roles);
+            commitSetRoles(context, response.data.roles);
         } catch (error) {
-            context.dispatch(actionCheckApiError, error);
+            await dispatchCheckApiError(context, error);
         }
     },
 };
