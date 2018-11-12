@@ -10,8 +10,7 @@ module.exports = {
           'v-card': 'src',
           'v-card-media': 'src',
           'v-responsive': 'src',
-          //...
         }
-      }))
+      }));
   },
 }
