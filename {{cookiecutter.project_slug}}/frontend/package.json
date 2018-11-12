@@ -32,7 +32,8 @@
     "ts-jest": "^23.0.0",
     "typescript": "^3.0.0",
     "vue-cli-plugin-vuetify": "^0.2.1",
-    "vue-template-compiler": "^2.5.17"
+    "vue-template-compiler": "^2.5.17",
+    "vuex-typescript": "^3.0.2"
   },
   "postcss": {
     "plugins": {
