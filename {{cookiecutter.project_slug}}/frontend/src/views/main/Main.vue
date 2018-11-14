@@ -126,7 +126,7 @@ import {
   readDashboardShowDrawer,
   commitSetDashboardMiniDrawer,
   readDashboardMiniDrawer,
-  dispatchLogOut,
+  dispatchUserLogOut,
 } from '@/store/accessors';
 
 const routeGuardMain = async (to, from, next) => {
@@ -176,7 +176,7 @@ export default class Main extends Vue {
   }
 
   public async logout() {
-    await dispatchLogOut(this.$store);
+    await dispatchUserLogOut(this.$store);
   }
 }
 </script>
