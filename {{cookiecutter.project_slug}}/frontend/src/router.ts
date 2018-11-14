@@ -1,7 +1,6 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 
-import Start from './views/main/Start.vue';
 import RouterComponent from './components/RouterComponent.vue';
 
 Vue.use(Router);
@@ -12,7 +11,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      component: Start,
+      component: () => import(/* webpackChunkName: "start" */ './views/main/Start.vue'),
       children: [
         {
           path: 'login',
