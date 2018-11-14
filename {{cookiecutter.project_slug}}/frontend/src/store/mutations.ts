@@ -1,5 +1,5 @@
 import { IUserProfile } from '@/interfaces';
-import { State } from '.';
+import { State, AppNotification } from '.';
 
 
 export const mutations = {
@@ -31,5 +31,11 @@ export const mutations = {
     },
     setRoles(state: State, payload: string[]) {
         state.admin.roles = payload;
+    },
+    addNotification(state: State, payload: AppNotification) {
+        state.notifications.push(payload);
+    },
+    removeNotification(state: State, payload: AppNotification) {
+        state.notifications = state.notifications.filter((notification) => notification !== payload);
     },
 };
