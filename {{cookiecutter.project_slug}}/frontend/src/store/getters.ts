@@ -20,4 +20,5 @@ export const getters = {
             return { ...filteredUsers[0] };
         }
     },
+    firstNotification: (state: State) => state.notifications.length > 0 && state.notifications[0],
 };
