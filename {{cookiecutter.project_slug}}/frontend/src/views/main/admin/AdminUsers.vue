@@ -33,7 +33,7 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { IUserProfile } from '@/interfaces';
-import { readAdminUsers, dispatchGetUsers } from '@/store/accessors';
+import { readAdminUsers, dispatchGetUsers } from '@/store/admin/accessors';
 
 @Component
 export default class UserProfile extends Vue {

@@ -21,7 +21,7 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { dispatchCheckLoggedIn, readIsLoggedIn, commitAddNotification } from '@/store/accessors';
+import { dispatchCheckLoggedIn, readIsLoggedIn, commitAddNotification } from '@/store/main/accessors';
 import NotificationsManager from '@/components/NotificationsManager.vue';
 
 @Component({

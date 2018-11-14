@@ -5,10 +5,11 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { store } from '@/store';
-import { dispatchGetRoles } from '@/store/accessors';
+import { readHasAdminAccess } from '@/store/main/accessors';
+import { dispatchGetRoles } from '@/store/admin/accessors';
 
 const routeGuardAdmin = async (to, from, next) => {
-  if (!store.getters.hasAdminAccess) {
+  if (!readHasAdminAccess(store)) {
     next('/main');
   } else {
     next();

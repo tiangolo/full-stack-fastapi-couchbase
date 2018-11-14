@@ -51,8 +51,8 @@ import {
   dispatchGetRoles,
   dispatchUpdateUser,
   readAdminOneUser,
-readAdminRoles,
-} from '@/store/accessors';
+  readAdminRoles,
+} from '@/store/admin/accessors';
 
 @Component
 export default class EditUser extends Vue {

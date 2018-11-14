@@ -32,7 +32,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
-import { readUserProfile } from '@/store/accessors';
+import { readUserProfile } from '@/store/main/accessors';
 
 @Component
 export default class UserProfile extends Vue {

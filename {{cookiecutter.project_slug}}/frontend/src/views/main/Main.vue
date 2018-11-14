@@ -38,7 +38,7 @@
           </v-list-tile>
         </v-list>
         <v-divider></v-divider>
-        <v-list subheader v-show="$store.getters.hasAdminAccess">
+        <v-list subheader v-show="hasAdminAccess">
           <v-subheader>Admin</v-subheader>
           <v-list-tile to="/main/admin/users/all">
             <v-list-tile-action>
@@ -127,7 +127,8 @@ import {
   commitSetDashboardMiniDrawer,
   readDashboardMiniDrawer,
   dispatchUserLogOut,
-} from '@/store/accessors';
+readHasAdminAccess,
+} from '@/store/main/accessors';
 
 const routeGuardMain = async (to, from, next) => {
   if (to.path === '/main') {
@@ -173,6 +174,10 @@ export default class Main extends Vue {
       this.$store,
       !readDashboardMiniDrawer(this.$store),
     );
+  }
+
+  public get hasAdminAccess() {
+    return readHasAdminAccess(this.$store);
   }
 
   public async logout() {
