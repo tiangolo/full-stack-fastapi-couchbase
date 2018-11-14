@@ -12,6 +12,12 @@ export interface AdminState {
   roles: string[];
 }
 
+export interface AppNotification {
+  content: string;
+  color?: string;
+  showProgress?: boolean;
+}
+
 export interface State {
   token: string;
   isLoggedIn: boolean | null;
@@ -20,6 +26,7 @@ export interface State {
   dashboardMiniDrawer: boolean;
   dashboardShowDrawer: boolean;
   admin: AdminState;
+  notifications: AppNotification[];
 }
 
 Vue.use(Vuex);
@@ -31,6 +38,7 @@ const defaultState: State = {
   userProfile: null,
   dashboardMiniDrawer: false,
   dashboardShowDrawer: true,
+  notifications: [],
   admin: {
     users: [],
     roles: [],
