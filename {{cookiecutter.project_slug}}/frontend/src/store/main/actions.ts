@@ -13,17 +13,15 @@ import {
     dispatchCheckApiError,
     dispatchRemoveLogIn,
     dispatchRouteLogOut,
-    commitSetUsers,
-    commitSetUser,
-    commitSetRoles,
     commitRemoveNotification,
     commitAddNotification,
 } from './accessors';
 import { AxiosError } from 'axios';
-import { IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
-import { State, AppNotification } from '.';
+import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
+import { State } from '../state';
+import { MainState, AppNotification } from './state';
 
-type MainContext = ActionContext<State, State>;
+type MainContext = ActionContext<MainState, State>;
 
 export const actions = {
     async actionLogIn(context: MainContext, payload: { username: string; password: string }) {
@@ -58,10 +56,15 @@ export const actions = {
     },
     async actionUpdateUserProfile(context: MainContext, payload) {
         try {
-            const response = await api.updateMe(context.state.token, payload);
-            if (response.data) {
-                commitSetUserProfile(context, response.data);
-            }
+            const loadingNotification = { content: 'saving', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.updateMe(context.state.token, payload),
+                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
+            commitSetUserProfile(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, {content: 'Profile successfully updated', color: 'success'});
         } catch (error) {
             await dispatchCheckApiError(context, error);
         }
@@ -115,54 +118,6 @@ export const actions = {
     actionRouteLoggedIn(context: MainContext) {
         if (router.currentRoute.path === '/login' || router.currentRoute.path === '/') {
             router.push('/main');
-        }
-    },
-    async actionGetUsers(context: MainContext) {
-        try {
-            const response = await api.getUsers(context.state.token);
-            if (response) {
-                commitSetUsers(context, response.data);
-            }
-        } catch (error) {
-            await dispatchCheckApiError(context, error);
-        }
-    },
-    async actionUpdateUser(context: MainContext, payload: { name: string, user: IUserProfileUpdate }) {
-        try {
-            const loadingNotification = { content: 'saving', showProgress: true };
-            commitAddNotification(context, loadingNotification);
-            const response = (await Promise.all([
-                api.updateUser(context.state.token, payload.name, payload.user),
-                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-            ]))[0];
-            commitSetUser(context, response.data);
-            commitRemoveNotification(context, loadingNotification);
-            commitAddNotification(context, {content: 'User successfully updated', color: 'success'});
-        } catch (error) {
-            await dispatchCheckApiError(context, error);
-        }
-    },
-    async actionCreateUser(context: MainContext, payload: IUserProfileCreate) {
-        try {
-            const loadingNotification = { content: 'saving', showProgress: true };
-            commitAddNotification(context, loadingNotification);
-            const response = (await Promise.all([
-                api.createUser(context.state.token, payload),
-                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
-            ]))[0];
-            commitSetUser(context, response.data);
-            commitRemoveNotification(context, loadingNotification);
-            commitAddNotification(context, { content: 'User successfully created', color: 'success' });
-        } catch (error) {
-            await dispatchCheckApiError(context, error);
-        }
-    },
-    async actionGetRoles(context: MainContext) {
-        try {
-            const response = await api.getRoles(context.state.token);
-            commitSetRoles(context, response.data.roles);
-        } catch (error) {
-            await dispatchCheckApiError(context, error);
         }
     },
     async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number }) {
