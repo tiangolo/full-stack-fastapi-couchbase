@@ -15,6 +15,7 @@ export const readIsLoggedIn = read(getters.isLoggedIn);
 export const readLoginError = read(getters.loginError);
 export const readToken = read(getters.token);
 export const readUserProfile = read(getters.userProfile);
+export const readFirstNotification = read(getters.firstNotification);
 
 export const commitSetDashboardMiniDrawer = commit(mutations.setDashboardMiniDrawer);
 export const commitSetDashboardShowDrawer = commit(mutations.setDashboardShowDrawer);
@@ -25,6 +26,8 @@ export const commitSetToken = commit(mutations.setToken);
 export const commitSetUser = commit(mutations.setUser);
 export const commitSetUserProfile = commit(mutations.setUserProfile);
 export const commitSetUsers = commit(mutations.setUsers);
+export const commitAddNotification = commit(mutations.addNotification);
+export const commitRemoveNotification = commit(mutations.removeNotification);
 
 export const dispatchCheckApiError = dispatch(actions.actionCheckApiError);
 export const dispatchCheckLoggedIn = dispatch(actions.actionCheckLoggedIn);
@@ -34,8 +37,10 @@ export const dispatchGetUserProfile = dispatch(actions.actionGetUserProfile);
 export const dispatchGetUsers = dispatch(actions.actionGetUsers);
 export const dispatchLogIn = dispatch(actions.actionLogIn);
 export const dispatchLogOut = dispatch(actions.actionLogOut);
+export const dispatchUserLogOut = dispatch(actions.actionUserLogOut);
 export const dispatchRemoveLogIn = dispatch(actions.actionRemoveLogIn);
 export const dispatchRouteLoggedIn = dispatch(actions.actionRouteLoggedIn);
 export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
+export const dispatchRemoveNotification = dispatch(actions.removeNotification);

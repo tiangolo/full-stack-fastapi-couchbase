@@ -16,10 +16,12 @@ import {
     commitSetUsers,
     commitSetUser,
     commitSetRoles,
+    commitRemoveNotification,
+    commitAddNotification,
 } from './accessors';
 import { AxiosError } from 'axios';
 import { IUserProfileUpdate, IUserProfileCreate } from '@/interfaces';
-import { State } from '.';
+import { State, AppNotification } from '.';
 
 type MainContext = ActionContext<State, State>;
 
@@ -35,6 +37,7 @@ export const actions = {
                 commitSetLogInError(context, false);
                 await dispatchGetUserProfile(context);
                 await dispatchRouteLoggedIn(context);
+                commitAddNotification(context, { content: 'Logged in', color: 'success' });
             } else {
                 await dispatchLogOut(context);
             }
@@ -95,6 +98,10 @@ export const actions = {
         await dispatchRemoveLogIn(context);
         await dispatchRouteLogOut(context);
     },
+    async actionUserLogOut(context: MainContext) {
+        await dispatchLogOut(context);
+        commitAddNotification(context, { content: 'Logged out', color: 'success' });
+    },
     actionRouteLogOut(context: MainContext) {
         if (router.currentRoute.path !== '/login') {
             router.push('/login');
@@ -122,16 +129,30 @@ export const actions = {
     },
     async actionUpdateUser(context: MainContext, payload: { name: string, user: IUserProfileUpdate }) {
         try {
-            const response = await api.updateUser(context.state.token, payload.name, payload.user);
+            const loadingNotification = { content: 'saving', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.updateUser(context.state.token, payload.name, payload.user),
+                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
             commitSetUser(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, {content: 'User successfully updated', color: 'success'});
         } catch (error) {
             await dispatchCheckApiError(context, error);
         }
     },
     async actionCreateUser(context: MainContext, payload: IUserProfileCreate) {
         try {
-            const response = await api.createUser(context.state.token, payload);
+            const loadingNotification = { content: 'saving', showProgress: true };
+            commitAddNotification(context, loadingNotification);
+            const response = (await Promise.all([
+                api.createUser(context.state.token, payload),
+                await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
+            ]))[0];
             commitSetUser(context, response.data);
+            commitRemoveNotification(context, loadingNotification);
+            commitAddNotification(context, { content: 'User successfully created', color: 'success' });
         } catch (error) {
             await dispatchCheckApiError(context, error);
         }
@@ -143,5 +164,13 @@ export const actions = {
         } catch (error) {
             await dispatchCheckApiError(context, error);
         }
+    },
+    async removeNotification(context: MainContext, payload: { notification: AppNotification, timeout: number }) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                commitRemoveNotification(context, payload.notification);
+                resolve(true);
+            }, payload.timeout);
+        });
     },
 };
