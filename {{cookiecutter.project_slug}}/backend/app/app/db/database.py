@@ -1,12 +1,27 @@
-
 from couchbase import LOCKMODE_WAIT
 from couchbase.cluster import Cluster
 from couchbase.cluster import PasswordAuthenticator
 from app.db.couchbase_utils import get_cluster_couchbase_url
-
+from app.core.config import (
+    COUCHBASE_USER,
+    COUCHBASE_PASSWORD,
+    COUCHBASE_BUCKET_NAME,
+    COUCHBASE_HOST,
+    COUCHBASE_PORT,
+)
 
 # Types
 from couchbase.bucket import Bucket
+
+
+def get_default_bucket():
+    return get_bucket(
+        COUCHBASE_USER,
+        COUCHBASE_PASSWORD,
+        COUCHBASE_BUCKET_NAME,
+        host=COUCHBASE_HOST,
+        port=COUCHBASE_PORT,
+    )
 
 
 def get_cluster(username: str, password: str, host="couchbase", port="8091"):

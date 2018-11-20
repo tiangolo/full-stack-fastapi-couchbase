@@ -7,7 +7,7 @@ import requests
 from app.tests.utils.utils import random_lower_string, get_server_api
 from app.tests.utils.user import user_authentication_headers
 from app.core import config
-from app.db.bucket import bucket
+from app.db.database import get_default_bucket
 from app.crud.user import get_user, upsert_user
 from app.models.user import UserInCreate
 
@@ -36,6 +36,7 @@ def test_create_user_new_email(superuser_token_headers):
     )
     assert 200 <= r.status_code < 300
     created_user = r.json()
+    bucket = get_default_bucket()
     user = get_user(bucket, username)
     assert user.name == created_user["name"]
 
@@ -45,6 +46,7 @@ def test_get_existing_user(superuser_token_headers):
     username = random_lower_string()
     password = random_lower_string()
     user_in = UserInCreate(name=username, email=username, password=password)
+    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
     r = requests.get(
         f"{server_api}{config.API_V1_STR}/users/{username}",
@@ -62,6 +64,7 @@ def test_create_user_existing_username(superuser_token_headers):
     # username = email
     password = random_lower_string()
     user_in = UserInCreate(name=username, email=username, password=password)
+    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
     data = {"name": username, "password": password}
     r = requests.post(
@@ -79,6 +82,7 @@ def test_create_user_by_normal_user():
     username = random_lower_string()
     password = random_lower_string()
     user_in = UserInCreate(name=username, email=username, password=password)
+    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
     user_token_headers = user_authentication_headers(server_api, username, password)
     data = {"name": username, "password": password}
@@ -93,6 +97,7 @@ def test_retrieve_users(superuser_token_headers):
     username = random_lower_string()
     password = random_lower_string()
     user_in = UserInCreate(name=username, email=username, password=password)
+    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
 
     username2 = random_lower_string()

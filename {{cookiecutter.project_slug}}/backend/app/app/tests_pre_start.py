@@ -19,7 +19,9 @@ wait_seconds = 1
 )
 def init():
     # Check Couchbase is awake
-    from app.db.bucket import bucket  # noqa
+    from app.db.database import get_default_bucket  # noqa
+    bucket = get_default_bucket()
+    logger.info(f'Database bucket connection established with bucket object: {bucket}')
 
     # Wait for API to be awake, run one simple tests to authenticate
     test_get_access_token()

@@ -9,7 +9,7 @@ from flask_jwt_extended import get_current_user, jwt_required
 
 # Import app code
 from app.main import app
-from app.db.bucket import bucket
+from app.db.database import get_default_bucket
 from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
 from app.models.user import UserInCreate, UserInUpdate, UserStored
@@ -21,6 +21,7 @@ from app.crud.user import (
     upsert_user,
     update_user,
 )
+from app.utils import send_new_account_email
 
 
 # Import Schemas
@@ -44,6 +45,7 @@ def route_users_get(skip=0, limit=100):
         abort(400, "Inactive user")
     elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
+    bucket = get_default_bucket()
     users = get_users(bucket, skip=skip, limit=limit)
     return users
 
@@ -82,6 +84,7 @@ def route_users_post(
         abort(400, "Inactive user")
     elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
+    bucket = get_default_bucket()
     user = get_user(bucket, name)
     if user:
         return abort(400, f"The user with this username already exists in the system.")
@@ -94,7 +97,9 @@ def route_users_post(
         email=email,
         human_name=human_name,
     )
+    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
+    send_new_account_email(email_to=email, username=name, password=password)
     return user
 
 
@@ -131,6 +136,7 @@ def route_users_put(
         abort(400, "Inactive user")
     elif not check_if_user_is_superuser(current_user):
         abort(400, "The user doesn't have enough privileges")
+    bucket = get_default_bucket()
     user = get_user(bucket, name)
 
     if not user:
@@ -152,36 +158,25 @@ def route_users_put(
 @doc(description="Update own user", security=security_params, tags=["users"])
 @app.route(f"{config.API_V1_STR}/users/me", methods=["PUT"])
 @use_kwargs(
-    {
-        "password": fields.Str(),
-        "human_name": fields.Str(),
-        "email": fields.Str(),
-    }
+    {"password": fields.Str(), "human_name": fields.Str(), "email": fields.Str()}
 )
 @marshal_with(UserSchema())
 @jwt_required
-def route_users_me_put(
-    *,
-    password=None,
-    human_name=None,
-    email=None,
-):
+def route_users_me_put(*, password=None, human_name=None, email=None):
     current_user: UserStored = get_current_user()
 
     if not current_user:
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
-    user_in = UserInUpdate(
-        **current_user.json_dict()
-    )
+    user_in = UserInUpdate(**current_user.json_dict())
     if password is not None:
         user_in.password = password
     if human_name is not None:
         user_in.human_name = human_name
     if email is not None:
         user_in.email = email
-    
+    bucket = get_default_bucket()
     user = update_user(bucket, user_in)
     return user
 
@@ -215,6 +210,7 @@ def route_users_id_get(name):
         abort(400, "Could not authenticate user with provided token")
     elif not check_if_user_is_active(current_user):
         abort(400, "Inactive user")
+    bucket = get_default_bucket()
     user = get_user(bucket, name)
     if user == current_user:
         return user
@@ -238,9 +234,12 @@ def route_users_id_get(name):
 def route_users_post_open(*, name, password, email=None, human_name=None):
     if not config.USERS_OPEN_REGISTRATION:
         abort(403, "Open user resgistration is forbidden on this server")
+    bucket = get_default_bucket()
     user = get_user(bucket, name)
     if user:
         return abort(400, f"The user with this username already exists in the system")
-    user_in = UserInCreate(name=name, password=password, email=email, human_name=human_name)
+    user_in = UserInCreate(
+        name=name, password=password, email=email, human_name=human_name
+    )
     user = upsert_user(bucket, user_in)
     return user

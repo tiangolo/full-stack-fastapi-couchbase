@@ -5,7 +5,6 @@ from raven.contrib.flask import Sentry
 
 # Import app code
 from app.main import app
-from app.db.bucket import bucket
 from app.core import config
 
 # Set up CORS
