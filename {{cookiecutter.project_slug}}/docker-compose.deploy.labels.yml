@@ -13,6 +13,19 @@ services:
         - traefik.redirectorservice.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
         - traefik.webservice.frontend.entryPoints=https
+  sync-gateway:
+    deploy:
+      labels:
+        - traefik.frontend.rule=Host:sync.${DOMAIN}
+        - traefik.enable=true
+        - traefik.port=4984
+        - traefik.tags=${TRAEFIK_PUBLIC_TAG}
+        - traefik.docker.network=${TRAEFIK_PUBLIC_NETWORK}
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
   swagger-ui:
     deploy:
       labels:
