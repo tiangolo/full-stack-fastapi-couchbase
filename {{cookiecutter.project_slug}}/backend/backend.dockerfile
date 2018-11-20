@@ -6,7 +6,7 @@ RUN echo "deb http://packages.couchbase.com/ubuntu stretch stretch/main" > /etc/
 RUN apt-get update && apt-get install -y libcouchbase-dev build-essential
 
 RUN pip install --upgrade pip
-RUN pip install flask flask-cors raven[flask] celery==4.1.1 passlib[bcrypt] flask-apispec flask-jwt-extended tenacity requests pydantic couchbase
+RUN pip install flask flask-cors raven[flask] celery==4.1.1 passlib[bcrypt] flask-apispec flask-jwt-extended tenacity requests pydantic couchbase emails
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
