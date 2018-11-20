@@ -21,6 +21,14 @@ export default new Router({
           component: () => import(/* webpackChunkName: "login" */ './views/Login.vue'),
         },
         {
+          path: 'recover-password',
+          component: () => import(/* webpackChunkName: "recover-password" */ './views/PasswordRecovery.vue'),
+        },
+        {
+          path: 'reset-password',
+          component: () => import(/* webpackChunkName: "reset-password" */ './views/ResetPassword.vue'),
+        },
+        {
           path: 'main',
           component: () => import(/* webpackChunkName: "main" */ './views/main/Main.vue'),
           children: [
