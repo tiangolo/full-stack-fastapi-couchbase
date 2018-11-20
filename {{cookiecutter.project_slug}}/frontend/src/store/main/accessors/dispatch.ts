@@ -16,3 +16,5 @@ export const dispatchRouteLoggedIn = dispatch(actions.actionRouteLoggedIn);
 export const dispatchRouteLogOut = dispatch(actions.actionRouteLogOut);
 export const dispatchUpdateUserProfile = dispatch(actions.actionUpdateUserProfile);
 export const dispatchRemoveNotification = dispatch(actions.removeNotification);
+export const dispatchPasswordRecovery = dispatch(actions.passwordRecovery);
+export const dispatchResetPassword = dispatch(actions.resetPassword);
