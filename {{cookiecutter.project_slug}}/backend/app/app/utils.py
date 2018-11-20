@@ -21,15 +21,14 @@ from app.core.config import (
     SERVER_HOST,
     EMAIL_TEMPLATES_DIR,
     SECRET_KEY,
+    EMAILS_ENABLED
 )
 
 password_reset_jwt_subject = "preset"
 
 
 def send_email(email_to: str, subject_template="", html_template="", environment={}):
-    assert (
-        SMTP_HOST and SMTP_PORT and EMAILS_FROM_EMAIL
-    ), "no provided configuration for email variables"
+    assert EMAILS_ENABLED, "no provided configuration for email variables"
     message = emails.Message(
         subject=JinjaTemplate(subject_template),
         html=JinjaTemplate(html_template),
