@@ -1,10 +1,10 @@
-# Full Stack Flask Couchbase - project generator
+# Full Stack FastAPI Couchbase - project generator
 
-[![Build Status](https://travis-ci.org/tiangolo/full-stack-flask-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-flask-couchbase)
+[![Build Status](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase)
 
 Generate a backend and frontend stack using Python, including interactive API documentation.
 
-[![Screenshot](screenshot.png)](https://github.com/tiangolo/full-stack-flask-couchbase)
+[![Screenshot](screenshot.png)](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)
 
 ## Features
 
@@ -12,32 +12,31 @@ Generate a backend and frontend stack using Python, including interactive API do
 * Docker Swarm Mode deployment
 * Docker Compose integration and optimization for local development
 * Production ready Python web server using Nginx and uWSGI
-* Python Flask backend with:
-  * Flask-apispec: Swagger live documentation generation
-  * Marshmallow: model and data serialization (convert model objects to JSON)
-  * Webargs: parse, validate and document inputs to the endpoint / route
-  * Secure password hashing by default
-  * JWT token authentication
-  * Basic starting functionality for users and roles (modify and remove as you need)
-  * CORS (Cross Origin Resource Sharing)
+* Python FastAPI backend with:
+    * **Fast**: Very high performance, on par with **NodeJS** and **Go** (thanks to Starlette and Pydantic).
+    * **Intuitive**: Great editor support. <abbr title="also known as auto-complete, autocompletion, IntelliSense">Completion</abbr> everywhere. Less time debugging.
+    * **Easy**: Designed to be easy to use and learn. Less time reading docs.
+    * **Short**: Minimize code duplication. Multiple features from each parameter declaration.
+    * **Robust**: Get production-ready code. With automatic interactive documentation.
+    * **Standards-based**: Based on (and fully compatible with) the open standards for APIs: <a href="https://github.com/OAI/OpenAPI-Specification" target="_blank">OpenAPI</a> and <a href="http://json-schema.org/" target="_blank">JSON Schema</a>.
+    * [**Many other features**](https://github.com/tiangolo/fastapi) including automatic validation, serialization, interactive documentation, authentication with OAuth2 JWT tokens, etc.
 * Celery worker that can import and use code from the rest of the backend selectively (you don't have to install the complete app in each worker)
 * NoSQL Couchbase database that supports direct synchronization via Couchbase Sync Gateway for offline-first applications
 * REST backend tests based on Pytest, integrated with Docker, so you can test the full API interaction, independent on the database. As it runs in Docker, it can build a new data store from scratch each time (so you can use ElasticSearch, MongoDB, or whatever you want, and just test that the API works).
 * Easy Python integration with Jupyter Kernels for remote or in-Docker development with extensions like Atom Hydrogen or Visual Studio Code Jupyter
 * Vue frontend:
-  * Generated with Vue CLI
-  * JWT Authentication handling
-  * Login view
-  * After login, main dashboard view
-  * Vuex
-  * Vue-router
-  * Vuetify for beautiful material design components
-  * TypeScript
-  * Docker server based on Nginx (configured to play nicely with Vue-router)
-  * Docker multi-stage building, so you don't need to save or commit compiled code
-  * Frontend tests ran at build time (can be disabled too)
-  * Made as modular as possible, so it works out of the box, but you can re-generate with Vue CLI or create it as you need, and re-use what you want
-* Swagger-UI for live interactive documentation
+    * Generated with Vue CLI
+    * JWT Authentication handling
+    * Login view
+    * After login, main dashboard view
+    * Vuex
+    * Vue-router
+    * Vuetify for beautiful material design components
+    * TypeScript
+    * Docker server based on Nginx (configured to play nicely with Vue-router)
+    * Docker multi-stage building, so you don't need to save or commit compiled code
+    * Frontend tests ran at build time (can be disabled too)
+    * Made as modular as possible, so it works out of the box, but you can re-generate with Vue CLI or create it as you need, and re-use what you want
 * Flower for Celery jobs monitoring
 * Load balancing between frontend and backend with Traefik, so you can have both under the same domain, separated by path, but served by different containers
 * Traefik integration, including Let's Encrypt HTTPS certificates automatic generation
@@ -49,7 +48,7 @@ Go to the directoy where you want to create your project and run:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack-flask-couchbase
+cookiecutter https://github.com/tiangolo/full-stack-fastapi-couchbase
 ```
 
 ### Generate passwords

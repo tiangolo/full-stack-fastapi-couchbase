@@ -21,9 +21,11 @@ docker-compose up -d
 
 Frontend, built with Docker, with routes handled based on the path: http://localhost
 
-Backend, JSON based web API, with Swagger automatic documentation: http://localhost/api/
+Backend, JSON based web API based on OpenAPI: http://localhost/api/
 
-Swagger UI, frontend user interface to interact with the API live: http://localhost/swagger/
+Automatic interactive documentation with Swagger UI (from the OpenAPI backend): http://localhost/docs
+
+Alternative automatic documentation with ReDoc (from the OpenAPI backend): http://localhost/redoc
 
 Couchbase, web administration: http://http://localhost:8091
 
@@ -51,9 +53,7 @@ If your Docker is not running in `localhost` (the URLs above wouldn't work) chec
 
 ### General workflow
 
-Modify or add Marshmallow schemas in `./backend/app/app/schemas` and API endpoints in `./backend/app/app/api/`.
-
-To simplify development with documents (with editor support, checks, completion, etc) use and update Pydantic document models in `./backend/app/app/models`.
+Modify or add Pydantic models in `./backend/app/app/models` and API endpoints in `./backend/app/app/api/`.
 
 Add and modify tasks to the Celery worker in `./backend/app/app/worker.py`. 
 
@@ -69,7 +69,7 @@ The changes to those files only affect the local development environment, not th
 
 For example, the directory with the backend code is mounted as a Docker "host volume" (in the file `docker-compose.dev.volumes.yml`), mapping the code you change live to the directory inside the container. That allows you to test your changes right away, without having to build the Docker image again. It should only be done during development, for production, you should build the Docker image with a recent version of the backend code. But during development, it allows you to iterate very fast.
 
-There is also a commented out `command` override (in the file `docker-compose.dev.command.yml`), if you want to enable it, uncomment it. It makes the backend container run a process that does "nothing", but keeps the process running. That allows you to get inside your living container and run commands inside, for example a Python interpreter to test installed dependencies, or start the Flask development server that reloads when it detectes changes.
+There is also a commented out `command` override (in the file `docker-compose.dev.command.yml`), if you want to enable it, uncomment it. It makes the backend container run a process that does "nothing", but keeps the process running. That allows you to get inside your living container and run commands inside, for example a Python interpreter to test installed dependencies, or start the development server that reloads when it detectes changes.
 
 To get inside the container with a `bash` session you can start the stack with:
 
@@ -91,25 +91,24 @@ root@7f2607af31c3:/app#
 
 that means that you are in a `bash` session inside your container, as a `root` user, under the `/app` directory.
 
-There is also a declaration of an environment variable `$RUN` to run the Flask development server (in the file `docker-compose.dev.env.yml`), with all the configurations to make it work in Docker. You can "run" that environment variable and it will start that Flask development server with:
+There is also a script `backend-live.sh` to run the debug live reloading server. You can run that script from inside the container with:
 
 ```bash
-$RUN
+bash ./backend-live.sh
 ```
 
 ...it will look like:
 
 ```bash
-root@7f2607af31c3:/app# $RUN
+root@7f2607af31c3:/app# bash ./backend-live.sh
 ```
 
-and then hit enter. That runs the Flask development server that auto reloads when it detects code changes.
+and then hit enter. That runs the debugging server that auto reloads when it detects code changes.
 
 Nevertheless, if it doesn't detect a change but a syntax error, it will just stop with an error. But as the container is still alive and you are in a Bash session, you can quickly restart it after fixing the error, running the same command ("up arrow" and "Enter").
 
-...this previous detail is what makes it useful to have the container alive doing nothing and then, in a Bash session, make it run the Flask development server.
+...this previous detail is what makes it useful to have the container alive doing nothing and then, in a Bash session, make it run the debugging server.
 
-The Celery worker has a `$RUN` variable too, running the Celery worker, so that you can test it while being inside the container and debug errors, etc.
 
 ### Backend tests
 
@@ -587,7 +586,9 @@ Frontend: https://{{cookiecutter.domain_main}}
 
 Backend: https://{{cookiecutter.domain_main}}/api/
 
-Swagger UI: https://{{cookiecutter.domain_main}}/swagger/
+Automatic Interactive Docs (Swagger UI): https://{{cookiecutter.domain_main}}/docs
+
+Automatic Alternative Docs (ReDoc): https://{{cookiecutter.domain_main}}/redoc
 
 Couchbase: https://db.{{cookiecutter.domain_main}}/
 
@@ -601,7 +602,9 @@ Frontend: https://{{cookiecutter.domain_staging}}
 
 Backend: https://{{cookiecutter.domain_staging}}/api/
 
-Swagger UI: https://{{cookiecutter.domain_staging}}/swagger/
+Automatic Interactive Docs (Swagger UI): https://{{cookiecutter.domain_staging}}/docs
+
+Automatic Alternative Docs (ReDoc): https://{{cookiecutter.domain_staging}}/redoc
 
 Couchbase: https://db.{{cookiecutter.domain_staging}}/
 
@@ -615,7 +618,9 @@ Frontend: http://localhost
 
 Backend: http://localhost/api/
 
-Swagger UI: http://localhost/swagger/
+Automatic Interactive Docs (Swagger UI): https://localhost/docs
+
+Automatic Alternative Docs (ReDoc): https://localhost/redoc
 
 Couchbase: http://localhost:8091/
 
@@ -631,7 +636,9 @@ Frontend: http://local.dockertoolbox.tiangolo.com
 
 Backend: http://local.dockertoolbox.tiangolo.com/api/
 
-Swagger UI: http://local.dockertoolbox.tiangolo.com/swagger/
+Automatic Interactive Docs (Swagger UI): https://local.dockertoolbox.tiangolo.com/docs
+
+Automatic Alternative Docs (ReDoc): https://local.dockertoolbox.tiangolo.com/redoc
 
 Couchbase: http://local.dockertoolbox.tiangolo.com:8091
 
@@ -647,7 +654,9 @@ Frontend: http://dev.{{cookiecutter.domain_main}}
 
 Backend: http://dev.{{cookiecutter.domain_main}}/api/
 
-Swagger UI: http://dev.{{cookiecutter.domain_main}}/swagger/
+Automatic Interactive Docs (Swagger UI): https://dev.{{cookiecutter.domain_main}}/docs
+
+Automatic Alternative Docs (ReDoc): https://dev.{{cookiecutter.domain_main}}/redoc
 
 Couchbase: http://dev.{{cookiecutter.domain_main}}:8091
 
@@ -663,7 +672,9 @@ Frontend: http://localhost.tiangolo.com
 
 Backend: http://localhost.tiangolo.com/api/
 
-Swagger UI: http://localhost.tiangolo.com/swagger/
+Automatic Interactive Docs (Swagger UI): https://localhost.tiangolo.com/docs
+
+Automatic Alternative Docs (ReDoc): https://localhost.tiangolo.com/redoc
 
 Couchbase: http://localhost.tiangolo.com:8091
 
@@ -673,18 +684,18 @@ Traefik UI: http://localhost.tiangolo.com:8090
 
 ## Project generation and updating, or re-generating
 
-This project was generated using https://github.com/tiangolo/full-stack-flask-couchbase with:
+This project was generated using https://github.com/tiangolo/full-stack-fastapi-couchbase with:
 
 ```bash
 pip install cookiecutter
-cookiecutter https://github.com/tiangolo/full-stack-flask-couchbase
+cookiecutter https://github.com/tiangolo/full-stack-fastapi-couchbase
 ```
 
 You can check the variables used during generation in the file `cookiecutter-config-file.yml`.
 
 You can generate the project again with the same configurations used the first time.
 
-That would be useful if, for example, the project generator (`tiangolo/full-stack-flask-couchbase`) was updated and you want to integrate or review the changes.
+That would be useful if, for example, the project generator (`tiangolo/full-stack-fastapi-couchbase`) was updated and you want to integrate or review the changes.
 
 You could generate a new project with the same configurations as this one in a parallel directory. And compare the differences between the two, without having to overwrite your current code but being able to use the same variables used for your current project.
 
@@ -695,7 +706,7 @@ You can use that file while generating a new project to reuse all those variable
 For example, run:
 
 ```bash
-cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack-flask-couchbase
+cookiecutter --config-file ./cookiecutter-config-file.yml --output-dir ../project-copy https://github.com/tiangolo/full-stack-fastapi-couchbase
 ```
 
 That will use the file `cookiecutter-config-file.yml` in the current directory (in this project) to generate a new project inside a sibling directory `project-copy`.
