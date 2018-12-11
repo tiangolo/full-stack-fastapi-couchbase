@@ -1,13 +1,12 @@
+from enum import Enum
+from typing import Sequence, Type, Union
+
+from app.core.config import COUCHBASE_BUCKET_NAME
 from couchbase.bucket import Bucket
 from couchbase.n1ql import N1QLQuery
 
-from app.core.config import COUCHBASE_BUCKET_NAME
 
-from typing import Sequence, Union
-from enum import Enum
-
-
-def ensure_enums_to_strs(items: Sequence[Union[Enum, str]]):
+def ensure_enums_to_strs(items: Union[Sequence[Union[Enum, str]], Type[Enum]]):
     str_items = []
     for item in items:
         if isinstance(item, Enum):

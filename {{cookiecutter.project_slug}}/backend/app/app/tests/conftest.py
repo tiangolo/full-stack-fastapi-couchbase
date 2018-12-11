@@ -1,5 +1,4 @@
 import pytest
-
 from app.tests.utils.utils import get_server_api, get_superuser_token_headers
 
 

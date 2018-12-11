@@ -1,6 +1,6 @@
 # Installed packages
-from couchbase.bucket import Bucket
 import requests
+from fastapi.encoders import jsonable_encoder
 
 # Install app code
 from app.core.config import (
@@ -10,22 +10,23 @@ from app.core.config import (
     COUCHBASE_SYNC_GATEWAY_PORT,
 )
 from app.core.security import get_password_hash, verify_password
-from app.models.user import UserStored, UserSyncIn, UserInCreate, UserInUpdate
-from app.models.role import RoleEnum
+from app.crud.utils import ensure_enums_to_strs, get_all_documents_by_type
 from app.models.config import USERPROFILE_DOC_TYPE
-from app.crud.utils import get_all_documents_by_type, ensure_enums_to_strs
+from app.models.role import RoleEnum
+from app.models.user import UserInCreate, UserInDB, UserInUpdate, UserSyncIn
+from couchbase.bucket import Bucket
 
 
-def get_user_doc_id(name):
-    return f"userprofile::{name}"
+def get_user_doc_id(username):
+    return f"userprofile::{username}"
 
 
-def get_user(bucket: Bucket, name: str):
-    doc_id = get_user_doc_id(name)
+def get_user(bucket: Bucket, username: str):
+    doc_id = get_user_doc_id(username)
     result = bucket.get(doc_id, quiet=True)
     if not result.value:
         return None
-    user = UserStored(**result.value)
+    user = UserInDB(**result.value)
     user.Meta.key = result.key
     return user
 
@@ -34,7 +35,7 @@ def upsert_sync_gateway_user(user: UserSyncIn):
     name = user.name
     url = f"http://{COUCHBASE_SYNC_GATEWAY_HOST}:{COUCHBASE_SYNC_GATEWAY_PORT}/{COUCHBASE_SYNC_GATEWAY_DATABASE}/_user/{name}"
 
-    data = user.json_dict()
+    data = jsonable_encoder(user)
     response = requests.put(url, json=data)
     return response.status_code == 200 or response.status_code == 201
 
@@ -43,19 +44,19 @@ def update_sync_gateway_user(user: UserSyncIn):
     name = user.name
     url = f"http://{COUCHBASE_SYNC_GATEWAY_HOST}:{COUCHBASE_SYNC_GATEWAY_PORT}/{COUCHBASE_SYNC_GATEWAY_DATABASE}/_user/{name}"
     if user.password:
-        data = user.json_dict()
+        data = jsonable_encoder(user)
     else:
-        data = user.json_dict(exclude=set(["password"]))
+        data = jsonable_encoder(user, exclude={"password"})
     response = requests.put(url, json=data)
     return response.status_code == 200 or response.status_code == 201
 
 
 def upsert_user_in_db(bucket: Bucket, user_in: UserInCreate):
-    user_doc_id = get_user_doc_id(user_in.name)
+    user_doc_id = get_user_doc_id(user_in.username)
     passwordhash = get_password_hash(user_in.password)
 
-    user = UserStored(**user_in.json_dict(), hashed_password=passwordhash)
-    doc_data = user.json_dict()
+    user = UserInDB(**user_in.dict(), hashed_password=passwordhash)
+    doc_data = jsonable_encoder(user)
     bucket.upsert(user_doc_id, doc_data)
     return user
 
@@ -70,21 +71,21 @@ def update_user_in_db(bucket: Bucket, user_in: UserInUpdate):
     if user_in.password:
         passwordhash = get_password_hash(user_in.password)
         stored_user.hashed_password = passwordhash
-    data = stored_user.json_dict()
+    data = jsonable_encoder(stored_user)
     bucket.upsert(stored_user.Meta.key, data)
     return stored_user
 
 
 def upsert_user(bucket: Bucket, user_in: UserInCreate):
     user = upsert_user_in_db(bucket, user_in)
-    user_in_sync = UserSyncIn(**user_in.json_dict())
+    user_in_sync = UserSyncIn(**user_in.dict(), name=user_in.username)
     assert upsert_sync_gateway_user(user_in_sync)
     return user
 
 
 def update_user(bucket: Bucket, user_in: UserInUpdate):
     user = update_user_in_db(bucket, user_in)
-    user_in_sync = UserSyncIn(**user_in.json_dict())
+    user_in_sync = UserSyncIn(**user_in.dict(), name=user_in.username)
     assert update_sync_gateway_user(user_in_sync)
     return user
 
@@ -98,11 +99,11 @@ def authenticate_user(bucket: Bucket, name: str, password: str):
     return user
 
 
-def check_if_user_is_active(user: UserStored):
+def check_if_user_is_active(user: UserInDB):
     return not user.disabled
 
 
-def check_if_user_is_superuser(user: UserStored):
+def check_if_user_is_superuser(user: UserInDB):
     return RoleEnum.superuser.value in ensure_enums_to_strs(user.admin_roles)
 
 
@@ -114,7 +115,7 @@ def get_users(bucket: Bucket, *, skip=0, limit=100):
     for item in doc_results:
         data = item[COUCHBASE_BUCKET_NAME]
         doc_id = item["id"]
-        user = UserStored(**data)
+        user = UserInDB(**data)
         user.Meta.key = doc_id
         users.append(user)
     return users

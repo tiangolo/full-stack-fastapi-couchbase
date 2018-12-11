@@ -1,180 +1,98 @@
-# Import standard library modules
+from typing import List
 
-# Import installed modules
-# # Import installed packages
-from flask import abort
-from webargs import fields
-from flask_apispec import doc, use_kwargs, marshal_with
-from flask_jwt_extended import get_current_user, jwt_required
+from fastapi import APIRouter, Depends
+from pydantic.types import EmailStr
+from starlette.exceptions import HTTPException
 
-# Import app code
-from app.main import app
-from app.db.database import get_default_bucket
-from app.api.api_v1.api_docs import docs, security_params
 from app.core import config
-from app.models.user import UserInCreate, UserInUpdate, UserStored
+from app.core.jwt import get_current_user
 from app.crud.user import (
     check_if_user_is_active,
     check_if_user_is_superuser,
     get_user,
     get_users,
-    upsert_user,
     update_user,
+    upsert_user,
 )
+from app.db.database import get_default_bucket
+from app.models.user import User, UserInCreate, UserInDB, UserInUpdate
 from app.utils import send_new_account_email
 
-
-# Import Schemas
-from app.schemas.user import UserSchema
+router = APIRouter()
 
 
-@docs.register
-@doc(description="Retrieve users", security=security_params, tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/", methods=["GET"])
-@use_kwargs(
-    {"skip": fields.Int(default=0), "limit": fields.Int(default=100)},
-    locations=["query"],
-)
-@marshal_with(UserSchema(many=True))
-@jwt_required
-def route_users_get(skip=0, limit=100):
-    current_user = get_current_user()
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
+@router.get("/users/", tags=["users"], response_model=List[User])
+def route_users_get(skip: int = 0, limit: int = 100, current_user: UserInDB = Depends(get_current_user)):
+    """
+    Retrieve users
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     elif not check_if_user_is_superuser(current_user):
-        abort(400, "The user doesn't have enough privileges")
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     bucket = get_default_bucket()
     users = get_users(bucket, skip=skip, limit=limit)
     return users
 
 
-@docs.register
-@doc(description="Create new user", security=security_params, tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/", methods=["POST"])
-@use_kwargs(
-    {
-        "name": fields.Str(required=True),
-        "password": fields.Str(required=True),
-        "admin_channels": fields.List(fields.Str()),
-        "admin_roles": fields.List(fields.Str()),
-        "disabled": fields.Boolean(),
-        "email": fields.Str(),
-        "human_name": fields.Str(),
-    }
-)
-@marshal_with(UserSchema())
-@jwt_required
+@router.post("/users/", tags=["users"], response_model=User)
 def route_users_post(
     *,
-    name,
-    password,
-    admin_channels=[],
-    admin_roles=[],
-    disabled=False,
-    email=None,
-    human_name=None,
+    user_in: UserInCreate, current_user: UserInDB = Depends(get_current_user)
 ):
-    current_user = get_current_user()
-
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
+    """
+    Create new user
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     elif not check_if_user_is_superuser(current_user):
-        abort(400, "The user doesn't have enough privileges")
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     bucket = get_default_bucket()
-    user = get_user(bucket, name)
+    user = get_user(bucket, user_in.username)
     if user:
-        return abort(400, f"The user with this username already exists in the system.")
-    user_in = UserInCreate(
-        name=name,
-        password=password,
-        admin_channels=admin_channels,
-        admin_roles=admin_roles,
-        disabled=disabled,
-        email=email,
-        human_name=human_name,
-    )
+        raise HTTPException(status_code=400, detail="The user with this username already exists in the system.")
     bucket = get_default_bucket()
     user = upsert_user(bucket, user_in)
-    if config.EMAILS_ENABLED:
-        send_new_account_email(email_to=email, username=name, password=password)
+    if config.EMAILS_ENABLED and user_in.email:
+        send_new_account_email(email_to=user_in.email, username=user_in.username, password=user_in.password)
     return user
 
 
-@docs.register
-@doc(description="Update a user", security=security_params, tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/<name>", methods=["PUT"])
-@use_kwargs(
-    {
-        "password": fields.Str(),
-        "admin_channels": fields.List(fields.Str()),
-        "admin_roles": fields.List(fields.Str()),
-        "disabled": fields.Boolean(),
-        "email": fields.Str(),
-        "human_name": fields.Str(),
-    }
-)
-@marshal_with(UserSchema())
-@jwt_required
+@router.put("/users/{username}", tags=["users"], response_model=User)
 def route_users_put(
     *,
-    name,
-    password=None,
-    admin_channels=None,
-    admin_roles=None,
-    disabled=None,
-    email=None,
-    human_name=None,
+    username: str,
+    user_in: UserInUpdate,
+    current_user: UserInDB = Depends(get_current_user)
 ):
-    current_user = get_current_user()
-
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
+    """
+    Update a user
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     elif not check_if_user_is_superuser(current_user):
-        abort(400, "The user doesn't have enough privileges")
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     bucket = get_default_bucket()
-    user = get_user(bucket, name)
+    user = get_user(bucket, username)
 
     if not user:
-        return abort(404, f"The user with this username does not exist in the system.")
-    user_in = UserInUpdate(
-        name=name,
-        password=password,
-        admin_channels=admin_channels,
-        admin_roles=admin_roles,
-        disabled=disabled,
-        email=email,
-        human_name=human_name,
-    )
+        raise HTTPException(status_code=404, detail="The user with this username does not exist in the system")
     user = update_user(bucket, user_in)
     return user
 
 
-@docs.register
-@doc(description="Update own user", security=security_params, tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/me", methods=["PUT"])
-@use_kwargs(
-    {"password": fields.Str(), "human_name": fields.Str(), "email": fields.Str()}
-)
-@marshal_with(UserSchema())
-@jwt_required
-def route_users_me_put(*, password=None, human_name=None, email=None):
-    current_user: UserStored = get_current_user()
-
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
-    user_in = UserInUpdate(**current_user.json_dict())
+@router.put("/users/me", tags=["users"], response_model=User)
+def route_users_me_put(*, password: str = None, full_name: str= None, email: EmailStr = None, current_user: UserInDB = Depends(get_current_user)):
+    """
+    Update own user
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    user_in = UserInUpdate(**current_user.dict())
     if password is not None:
         user_in.password = password
-    if human_name is not None:
-        user_in.human_name = human_name
+    if full_name is not None:
+        user_in.full_name = full_name
     if email is not None:
         user_in.email = email
     bucket = get_default_bucket()
@@ -182,65 +100,45 @@ def route_users_me_put(*, password=None, human_name=None, email=None):
     return user
 
 
-@docs.register
-@doc(description="Get current user", security=security_params, tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/me", methods=["GET"])
-@marshal_with(UserSchema())
-@jwt_required
-def route_users_me_get():
-    current_user = get_current_user()
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
+@router.get("/users/me", tags=["users"], response_model=User)
+def route_users_me_get(current_user: UserInDB = Depends(get_current_user)):
+    """
+    Get current user
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
 
 
-@docs.register
-@doc(
-    description="Get a specific user by username (email)",
-    security=security_params,
-    tags=["users"],
-)
-@app.route(f"{config.API_V1_STR}/users/<name>", methods=["GET"])
-@marshal_with(UserSchema())
-@jwt_required
-def route_users_id_get(name):
-    current_user = get_current_user()  # type: User
-    if not current_user:
-        abort(400, "Could not authenticate user with provided token")
-    elif not check_if_user_is_active(current_user):
-        abort(400, "Inactive user")
+@router.get("/users/{username}", tags=["users"], response_model=User)
+def route_users_id_get(username: str, current_user: UserInDB = Depends(get_current_user)):
+    """
+    Get a specific user by username (email)
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
     bucket = get_default_bucket()
-    user = get_user(bucket, name)
+    user = get_user(bucket, username)
     if user == current_user:
         return user
     if not check_if_user_is_superuser(current_user):
-        abort(400, "The user doesn't have enough privileges")
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     return user
 
 
-@docs.register
-@doc(description="Create new user without the need to be logged in", tags=["users"])
-@app.route(f"{config.API_V1_STR}/users/open", methods=["POST"])
-@use_kwargs(
-    {
-        "name": fields.Str(required=True),
-        "password": fields.Str(required=True),
-        "email": fields.Str(),
-        "human_name": fields.Str(),
-    }
-)
-@marshal_with(UserSchema())
-def route_users_post_open(*, name, password, email=None, human_name=None):
+@router.post("/users/open", tags=["users"], response_model=User)
+def route_users_post_open(*, username: str, password: str, email: EmailStr = None, full_name: str=None):
+    """
+    Create new user without the need to be logged in
+    """
     if not config.USERS_OPEN_REGISTRATION:
-        abort(403, "Open user resgistration is forbidden on this server")
+        raise HTTPException(status_code=403, detail="Open user resgistration is forbidden on this server")
     bucket = get_default_bucket()
-    user = get_user(bucket, name)
+    user = get_user(bucket, username)
     if user:
-        return abort(400, f"The user with this username already exists in the system")
+        raise HTTPException(status_code=400, detail="The user with this username already exists in the system")
     user_in = UserInCreate(
-        name=name, password=password, email=email, human_name=human_name
+        username=username, password=password, email=email, full_name=full_name
     )
     user = upsert_user(bucket, user_in)
     return user

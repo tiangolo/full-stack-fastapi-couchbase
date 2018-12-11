@@ -4,9 +4,9 @@ import requests
 from requests.auth import HTTPBasicAuth
 
 from app.core.config import (
-    COUCHBASE_MEMORY_QUOTA_MB,
-    COUCHBASE_INDEX_MEMORY_QUOTA_MB,
     COUCHBASE_FTS_MEMORY_QUOTA_MB,
+    COUCHBASE_INDEX_MEMORY_QUOTA_MB,
+    COUCHBASE_MEMORY_QUOTA_MB,
 )
 
 COUCHBASE_DEFAULT_USER = "Administrator"

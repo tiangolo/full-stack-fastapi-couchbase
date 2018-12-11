@@ -1,9 +1,5 @@
 version: '3.3'
 services:
-  swagger-ui:
-    image: swaggerapi/swagger-ui
-    environment:
-      - API_URL=https://${DOMAIN}/api/v1/swagger/
   proxy:
     image: traefik:v1.6
     volumes:
@@ -12,4 +8,3 @@ services:
     image: totem/celery-flower-docker
     env_file:
       - env-flower.env
-

@@ -1,29 +1,29 @@
 import logging
 
 from app.core.config import (
-    COUCHBASE_PASSWORD,
-    COUCHBASE_USER,
-    COUCHBASE_HOST,
-    COUCHBASE_PORT,
     COUCHBASE_BUCKET_NAME,
+    COUCHBASE_HOST,
+    COUCHBASE_MEMORY_QUOTA_MB,
+    COUCHBASE_PASSWORD,
+    COUCHBASE_PORT,
+    COUCHBASE_SYNC_GATEWAY_PASSWORD,
+    COUCHBASE_SYNC_GATEWAY_USER,
+    COUCHBASE_USER,
     FIRST_SUPERUSER,
     FIRST_SUPERUSER_PASSWORD,
-    COUCHBASE_SYNC_GATEWAY_USER,
-    COUCHBASE_SYNC_GATEWAY_PASSWORD,
-    COUCHBASE_MEMORY_QUOTA_MB,
 )
+from app.crud.user import upsert_user
 from app.db.couchbase_utils import (
     config_couchbase,
     ensure_create_bucket,
-    get_cluster_http_url,
     ensure_create_couchbase_user,
+    get_cluster_http_url,
 )
 from app.db.database import (
-    get_bucket,
     ensure_create_primary_index,
     ensure_create_type_index,
+    get_bucket,
 )
-from app.crud.user import upsert_user
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate
 
@@ -72,7 +72,7 @@ def init_db():
     logging.info("after ensure_create_couchbase_app_user sync")
     logging.info("before upsert_user first superuser")
     in_user = UserInCreate(
-        name=FIRST_SUPERUSER,
+        username=FIRST_SUPERUSER,
         password=FIRST_SUPERUSER_PASSWORD,
         email=FIRST_SUPERUSER,
         admin_roles=[RoleEnum.superuser],

@@ -26,13 +26,6 @@ services:
         - traefik.redirectorservice.frontend.redirect.entryPoint=https
         # Traefik service that listens to HTTPS
         - traefik.webservice.frontend.entryPoints=https
-  swagger-ui:
-    deploy:
-      labels:
-      - traefik.frontend.rule=PathPrefixStrip:/swagger/
-      - traefik.enable=true
-      - traefik.port=8080
-      - traefik.tags=${TRAEFIK_TAG}
   proxy:
     deploy:
       labels:

@@ -1,8 +1,7 @@
 import logging
 
-from tenacity import retry, stop_after_attempt, wait_fixed, before_log, after_log
-
 from app.tests.api.api_v1.test_token import test_get_access_token
+from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

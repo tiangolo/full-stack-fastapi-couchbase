@@ -1,18 +1,40 @@
-# Import standard library modules
+from datetime import datetime, timedelta
+from typing import Optional
 
-# Import installed modules
-from flask_jwt_extended import JWTManager
+import jwt
+from fastapi import Depends, Security
+from fastapi.security import OAuth2PasswordBearer
+from jwt import PyJWTError
+from starlette.exceptions import HTTPException
+from starlette.status import HTTP_403_FORBIDDEN
 
-# Import app code
-from ..main import app
-from app.db.database import get_default_bucket
+from app.core.config import SECRET_KEY
 from app.crud.user import get_user
+from app.db.database import get_default_bucket
+from app.models.token import TokenPayload
 
-# Setup the Flask-JWT-Extended extension
-jwt = JWTManager(app)
+ALGORITHM = "HS256"
+access_token_jwt_subject = "access"
 
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/login/access-token")
 
-@jwt.user_loader_callback_loader
-def get_current_user(identity):
+def get_current_user(token: str = Security(reusable_oauth2)):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        token_data = TokenPayload(**payload)
+    except PyJWTError as e:
+        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials")
     bucket = get_default_bucket()
-    return get_user(bucket, name=identity)
+    user = get_user(bucket, username=token_data.username)
+    return user
+
+
+def create_access_token(*, data: dict, expires_delta: timedelta = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire, "sub": access_token_jwt_subject})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
