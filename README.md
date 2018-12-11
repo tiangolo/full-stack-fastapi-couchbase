@@ -4,7 +4,7 @@
 
 Generate a backend and frontend stack using Python, including interactive API documentation.
 
-[![Screenshot](screenshot.png)](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)
+[![Screenshot](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)](https://github.com/tiangolo/full-stack-fastapi-couchbase)
 
 ## Features
 
