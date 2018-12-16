@@ -47,7 +47,7 @@ def test_get_existing_user(superuser_token_headers):
     password = random_lower_string()
     user_in = UserInCreate(username=username, email=username, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in)
+    user = upsert_user(bucket, user_in, persist_to=1)
     r = requests.get(
         f"{server_api}{config.API_V1_STR}/users/{username}",
         headers=superuser_token_headers,
@@ -65,7 +65,7 @@ def test_create_user_existing_username(superuser_token_headers):
     password = random_lower_string()
     user_in = UserInCreate(username=username, email=username, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in)
+    user = upsert_user(bucket, user_in, persist_to=1)
     data = {"username": username, "password": password}
     r = requests.post(
         f"{server_api}{config.API_V1_STR}/users/",
@@ -83,7 +83,7 @@ def test_create_user_by_normal_user():
     password = random_lower_string()
     user_in = UserInCreate(username=username, email=username, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in)
+    user = upsert_user(bucket, user_in, persist_to=1)
     user_token_headers = user_authentication_headers(server_api, username, password)
     data = {"username": username, "password": password}
     r = requests.post(
@@ -98,12 +98,12 @@ def test_retrieve_users(superuser_token_headers):
     password = random_lower_string()
     user_in = UserInCreate(username=username, email=username, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in)
+    user = upsert_user(bucket, user_in, persist_to=1)
 
     username2 = random_lower_string()
     password2 = random_lower_string()
     user_in2 = UserInCreate(username=username2, email=username2, password=password2)
-    user2 = upsert_user(bucket, user_in)
+    user2 = upsert_user(bucket, user_in, persist_to=1)
 
     r = requests.get(
         f"{server_api}{config.API_V1_STR}/users/", headers=superuser_token_headers

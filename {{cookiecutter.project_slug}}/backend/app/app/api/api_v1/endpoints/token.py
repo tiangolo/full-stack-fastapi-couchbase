@@ -25,7 +25,6 @@ from app.utils import (
 router = APIRouter()
 
 
-
 @router.post("/login/access-token", response_model=Token, tags=["login"])
 def route_login_access_token(username: str = Form(...), password: str = Form(...)):
     """
@@ -54,7 +53,6 @@ def route_test_token(current_user: UserInDB = Depends(get_current_user)):
     return current_user
 
 
-
 @router.post("/password-recovery/{username}", tags=["login"], response_model=Msg)
 def route_recover_password(username: str):
     """
@@ -64,7 +62,10 @@ def route_recover_password(username: str):
     user = get_user(bucket, username)
 
     if not user:
-        raise HTTPException(status_code=404, detail="The user with this username does not exist in the system.")
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system.",
+        )
     password_reset_token = generate_password_reset_token(username)
     send_reset_password_email(
         email_to=user.email, username=username, token=password_reset_token
@@ -83,7 +84,10 @@ def route_reset_password(token: str, new_password: str):
     bucket = get_default_bucket()
     user = get_user(bucket, username)
     if not user:
-        raise HTTPException(status_code=404, detail="The user with this username does not exist in the system.")
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system.",
+        )
     elif not check_if_user_is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     user_in = UserInUpdate(name=username, password=new_password)

@@ -11,6 +11,7 @@ prospector = "*"
 rope = "*"
 jupyter = "*"
 isort = "*"
+autoflake = "*"
 
 [packages]
 fastapi = "*"

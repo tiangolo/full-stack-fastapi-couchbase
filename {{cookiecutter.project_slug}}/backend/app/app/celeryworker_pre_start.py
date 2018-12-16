@@ -18,8 +18,9 @@ wait_seconds = 1
 def init():
     # Check Couchbase is awake
     from app.db.database import get_default_bucket
+
     bucket = get_default_bucket()
-    logger.info(f'Database bucket connection established with bucket object: {bucket}')
+    logger.info(f"Database bucket connection established with bucket object: {bucket}")
 
 
 def main():

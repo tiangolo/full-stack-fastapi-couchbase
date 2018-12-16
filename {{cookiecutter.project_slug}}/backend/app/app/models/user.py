@@ -41,9 +41,6 @@ class UserInDB(UserBaseInDB):
     type: str = USERPROFILE_DOC_TYPE
     hashed_password: str
 
-    class Meta:
-        key: Optional[str] = None
-
 
 class UserSyncIn(UserBase):
     name: str

@@ -32,7 +32,10 @@ def init_db():
     cluster_url = get_cluster_http_url(host=COUCHBASE_HOST, port=COUCHBASE_PORT)
     logging.info("before config_couchbase")
     config_couchbase(
-        username=COUCHBASE_USER, password=COUCHBASE_PASSWORD, host=COUCHBASE_HOST, port=COUCHBASE_PORT
+        username=COUCHBASE_USER,
+        password=COUCHBASE_PASSWORD,
+        host=COUCHBASE_HOST,
+        port=COUCHBASE_PORT,
     )
     logging.info("after config_couchbase")
     # COUCHBASE_USER="Administrator"
@@ -78,5 +81,5 @@ def init_db():
         admin_roles=[RoleEnum.superuser],
         admin_channels=[FIRST_SUPERUSER],
     )
-    upsert_user(bucket, in_user)
+    upsert_user(bucket, in_user, persist_to=1)
     logging.info("after upsert_user first superuser")

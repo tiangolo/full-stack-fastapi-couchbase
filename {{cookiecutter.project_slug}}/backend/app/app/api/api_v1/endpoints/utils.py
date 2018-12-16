@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, Body, Depends
 from pydantic.types import EmailStr
 from starlette.exceptions import HTTPException
@@ -24,8 +22,11 @@ def route_test_celery(msg: Msg, current_user: UserInDB = Depends(get_current_use
     celery_app.send_task("app.worker.test_celery", args=[msg.msg])
     return {"msg": "Word received"}
 
+
 @router.post("/test-email/", tags=["utils"], response_model=Msg, status_code=201)
-def route_test_email(email_to: EmailStr, current_user: UserInDB = Depends(get_current_user)):
+def route_test_email(
+    email_to: EmailStr, current_user: UserInDB = Depends(get_current_user)
+):
     """
     Test emails
     """

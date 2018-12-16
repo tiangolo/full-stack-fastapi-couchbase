@@ -17,9 +17,9 @@ def route_roles_get(current_user: UserInDB = Depends(get_current_user)):
     """
     if not check_if_user_is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
-    elif not (
-        check_if_user_is_superuser(current_user)
-    ):
-        raise HTTPException(status_code=400, detail="The current user does not have enogh privileges")
+    elif not (check_if_user_is_superuser(current_user)):
+        raise HTTPException(
+            status_code=400, detail="The current user does not have enogh privileges"
+        )
     roles = ensure_enums_to_strs(RoleEnum)
     return {"roles": roles}

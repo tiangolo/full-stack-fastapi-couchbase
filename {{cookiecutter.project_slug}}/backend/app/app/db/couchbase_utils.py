@@ -7,6 +7,8 @@ from app.core.config import (
     COUCHBASE_FTS_MEMORY_QUOTA_MB,
     COUCHBASE_INDEX_MEMORY_QUOTA_MB,
     COUCHBASE_MEMORY_QUOTA_MB,
+    COUCHBASE_N1QL_TIMEOUT_SECS,
+    COUCHBASE_OPERATION_TIMEOUT_SECS,
 )
 
 COUCHBASE_DEFAULT_USER = "Administrator"
@@ -26,8 +28,16 @@ def get_cluster_http_url(host="couchbase", port="8091"):
     return cluster_url
 
 
-def get_cluster_couchbase_url(host="couchbase", port="8091"):
-    cluster_url = f"couchbase://{host}:{port}"
+def get_cluster_couchbase_url(
+    host="couchbase",
+    port="8091",
+    fetch_mutation_tokens="1",
+    operation_timeout=f"{COUCHBASE_OPERATION_TIMEOUT_SECS}",
+    n1ql_timeout=f"{COUCHBASE_N1QL_TIMEOUT_SECS}",
+):
+    # fetch_mutation_tokens becomes required to be able to do persist_to=1: https://forums.couchbase.com/t/couchbase-returns-error-on-success/14196/2
+    # ref: https://docs.couchbase.com/c-sdk/2.10/client-settings.html#settings-list
+    cluster_url = f"couchbase://{host}:{port}?fetch_mutation_tokens={fetch_mutation_tokens}&operation_timeout={operation_timeout}&n1ql_timeout={n1ql_timeout}"
     return cluster_url
 
 
@@ -103,9 +113,13 @@ def check_couchbase_username_password(*, cluster_url, username, password):
 
 
 def ensure_couchbase_username_password(*, cluster_url, username, password):
-    if setup_couchbase_username_password(cluster_url=cluster_url, username=username, password=password):
+    if setup_couchbase_username_password(
+        cluster_url=cluster_url, username=username, password=password
+    ):
         return True
-    return check_couchbase_username_password(cluster_url=cluster_url, username=username, password=password)
+    return check_couchbase_username_password(
+        cluster_url=cluster_url, username=username, password=password
+    )
 
 
 def import_couchbase_default_data(*, cluster_url, username, password):
@@ -150,7 +164,12 @@ def ensure_create_bucket(
     ram_quota_mb=100,
     bucket_type="couchbase",
 ):
-    if is_bucket_created(cluster_url=cluster_url, username=username, password=password, bucket_name=bucket_name):
+    if is_bucket_created(
+        cluster_url=cluster_url,
+        username=username,
+        password=password,
+        bucket_name=bucket_name,
+    ):
         return True
     return create_bucket(
         cluster_url=cluster_url,
@@ -183,10 +202,23 @@ def create_couchbase_user(
     return r.status_code == 200
 
 
-def ensure_create_couchbase_user(*, cluster_url, username, password, new_user_id, new_user_password):
-    if is_couchbase_user_created(cluster_url=cluster_url, username=username, password=password, new_user_id=new_user_id):
+def ensure_create_couchbase_user(
+    *, cluster_url, username, password, new_user_id, new_user_password
+):
+    if is_couchbase_user_created(
+        cluster_url=cluster_url,
+        username=username,
+        password=password,
+        new_user_id=new_user_id,
+    ):
         return True
-    return create_couchbase_user(cluster_url=cluster_url, username=username, password=password, new_user_id=new_user_id, new_user_password=new_user_password)
+    return create_couchbase_user(
+        cluster_url=cluster_url,
+        username=username,
+        password=password,
+        new_user_id=new_user_id,
+        new_user_password=new_user_password,
+    )
 
 
 def config_couchbase(
@@ -203,8 +235,12 @@ def config_couchbase(
 
     logger.info("before setup_couchbase_services")
     assert setup_couchbase_services(
-        cluster_url=cluster_url, username=COUCHBASE_DEFAULT_USER, password=COUCHBASE_DEFAULT_PASSWORD
-    ) or setup_couchbase_services(cluster_url=cluster_url, username=username, password=password)
+        cluster_url=cluster_url,
+        username=COUCHBASE_DEFAULT_USER,
+        password=COUCHBASE_DEFAULT_PASSWORD,
+    ) or setup_couchbase_services(
+        cluster_url=cluster_url, username=username, password=password
+    )
     logger.info("after setup_couchbase_services")
 
     logger.info("before setup_memory_quota")
@@ -228,11 +264,17 @@ def config_couchbase(
     if not enterprise:
         logger.info("before setup_index_storage")
         assert setup_index_storage(
-            cluster_url=cluster_url, username=COUCHBASE_DEFAULT_USER, password=COUCHBASE_DEFAULT_PASSWORD
-        ) or setup_index_storage(cluster_url=cluster_url, username=username, password=password)
+            cluster_url=cluster_url,
+            username=COUCHBASE_DEFAULT_USER,
+            password=COUCHBASE_DEFAULT_PASSWORD,
+        ) or setup_index_storage(
+            cluster_url=cluster_url, username=username, password=password
+        )
         logger.info("after setup_index_storage")
 
     logger.info("before ensure_couchbase_username_password")
-    assert ensure_couchbase_username_password(cluster_url=cluster_url, username=username, password=password)
+    assert ensure_couchbase_username_password(
+        cluster_url=cluster_url, username=username, password=password
+    )
     logger.info("after ensure_couchbase_username_password")
     return True

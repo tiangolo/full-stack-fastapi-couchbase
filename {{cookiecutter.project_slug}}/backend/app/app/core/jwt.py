@@ -18,12 +18,15 @@ access_token_jwt_subject = "access"
 
 reusable_oauth2 = OAuth2PasswordBearer(tokenUrl="/api/v1/login/access-token")
 
+
 def get_current_user(token: str = Security(reusable_oauth2)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         token_data = TokenPayload(**payload)
     except PyJWTError as e:
-        raise HTTPException(status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials")
+        raise HTTPException(
+            status_code=HTTP_403_FORBIDDEN, detail="Could not validate credentials"
+        )
     bucket = get_default_bucket()
     user = get_user(bucket, username=token_data.username)
     return user

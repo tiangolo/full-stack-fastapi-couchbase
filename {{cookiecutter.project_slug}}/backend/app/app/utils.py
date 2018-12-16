@@ -61,7 +61,7 @@ def send_reset_password_email(email_to: str, username: str, token: str):
     subject = f"{PROJECT_NAME} - Password recovery for user {username}"
     with open(Path(EMAIL_TEMPLATES_DIR) / "reset_password.html") as f:
         template_str = f.read()
-    if hasattr(token, 'decode'):
+    if hasattr(token, "decode"):
         use_token = token.decode()
     else:
         use_token = token
@@ -108,18 +108,18 @@ def generate_password_reset_token(username):
         {
             "exp": exp,
             "nbf": now,
-            "sub": password_reset_jwt_subject,    
+            "sub": password_reset_jwt_subject,
             "username": username,
         },
         SECRET_KEY,
-        algorithm='HS256',
+        algorithm="HS256",
     )
     return encoded_jwt
 
 
 def verify_password_reset_token(token) -> Union[str, bool]:
     try:
-        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
+        decoded_token = jwt.decode(token, SECRET_KEY, algorithms=["HS256"])
         assert decoded_token["sub"] == password_reset_jwt_subject
         return decoded_token["username"]
     except InvalidTokenError:

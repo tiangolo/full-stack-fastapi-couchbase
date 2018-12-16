@@ -5,6 +5,7 @@ from fastapi.encoders import jsonable_encoder
 # Install app code
 from app.core.config import (
     COUCHBASE_BUCKET_NAME,
+    COUCHBASE_DURABILITY_TIMEOUT_SECS,
     COUCHBASE_SYNC_GATEWAY_DATABASE,
     COUCHBASE_SYNC_GATEWAY_HOST,
     COUCHBASE_SYNC_GATEWAY_PORT,
@@ -15,6 +16,7 @@ from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate, UserInDB, UserInUpdate, UserSyncIn
 from couchbase.bucket import Bucket
+from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
 
 
 def get_user_doc_id(username):
@@ -27,11 +29,27 @@ def get_user(bucket: Bucket, username: str):
     if not result.value:
         return None
     user = UserInDB(**result.value)
-    user.Meta.key = result.key
     return user
 
 
-def upsert_sync_gateway_user(user: UserSyncIn):
+def get_user_by_email(bucket: Bucket, email: str):
+    query_str = f"SELECT *, META().id as doc_id FROM {COUCHBASE_BUCKET_NAME} WHERE type = $type AND email = $email;"
+    q = N1QLQuery(
+        query_str, bucket=COUCHBASE_BUCKET_NAME, type=USERPROFILE_DOC_TYPE, email=email
+    )
+    q.consistency = CONSISTENCY_REQUEST
+    doc_results = bucket.n1ql_query(q)  # type: N1QLRequest
+    users = []
+    for item in doc_results:
+        data = item[COUCHBASE_BUCKET_NAME]
+        user = UserInDB(**data)
+        users.append(user)
+    if not users:
+        return None
+    return users[0]
+
+
+def insert_sync_gateway_user(user: UserSyncIn):
     name = user.name
     url = f"http://{COUCHBASE_SYNC_GATEWAY_HOST}:{COUCHBASE_SYNC_GATEWAY_PORT}/{COUCHBASE_SYNC_GATEWAY_DATABASE}/_user/{name}"
 
@@ -51,18 +69,22 @@ def update_sync_gateway_user(user: UserSyncIn):
     return response.status_code == 200 or response.status_code == 201
 
 
-def upsert_user_in_db(bucket: Bucket, user_in: UserInCreate):
+def upsert_user_in_db(bucket: Bucket, user_in: UserInCreate, persist_to=0):
     user_doc_id = get_user_doc_id(user_in.username)
     passwordhash = get_password_hash(user_in.password)
 
     user = UserInDB(**user_in.dict(), hashed_password=passwordhash)
     doc_data = jsonable_encoder(user)
-    bucket.upsert(user_doc_id, doc_data)
+    with bucket.durability(
+        persist_to=persist_to, timeout=COUCHBASE_DURABILITY_TIMEOUT_SECS
+    ):
+        bucket.upsert(user_doc_id, doc_data)
     return user
 
 
-def update_user_in_db(bucket: Bucket, user_in: UserInUpdate):
-    stored_user = get_user(bucket, user_in.name)
+def update_user_in_db(bucket: Bucket, user_in: UserInUpdate, persist_to=0):
+    user_doc_id = get_user_doc_id(user_in.username)
+    stored_user = get_user(bucket, username=user_in.username)
     for field in stored_user.fields:
         if field in user_in.fields:
             value_in = getattr(user_in, field)
@@ -72,20 +94,27 @@ def update_user_in_db(bucket: Bucket, user_in: UserInUpdate):
         passwordhash = get_password_hash(user_in.password)
         stored_user.hashed_password = passwordhash
     data = jsonable_encoder(stored_user)
-    bucket.upsert(stored_user.Meta.key, data)
+    with bucket.durability(
+        persist_to=persist_to, timeout=COUCHBASE_DURABILITY_TIMEOUT_SECS
+    ):
+        bucket.upsert(user_doc_id, data)
     return stored_user
 
 
-def upsert_user(bucket: Bucket, user_in: UserInCreate):
-    user = upsert_user_in_db(bucket, user_in)
+def upsert_user(bucket: Bucket, user_in: UserInCreate, persist_to=0):
+    user = upsert_user_in_db(bucket, user_in, persist_to=persist_to)
     user_in_sync = UserSyncIn(**user_in.dict(), name=user_in.username)
-    assert upsert_sync_gateway_user(user_in_sync)
+    assert insert_sync_gateway_user(user_in_sync)
     return user
 
 
-def update_user(bucket: Bucket, user_in: UserInUpdate):
-    user = update_user_in_db(bucket, user_in)
-    user_in_sync = UserSyncIn(**user_in.dict(), name=user_in.username)
+def update_user(bucket: Bucket, user_in: UserInUpdate, persist_to=0):
+    user = update_user_in_db(bucket, user_in, persist_to=persist_to)
+    user_in_sync_data = user.dict()
+    user_in_sync_data.update({"name": user.username})
+    if user_in.password:
+        user_in_sync_data.update({"password": user_in.password})
+    user_in_sync = UserSyncIn(**user_in_sync_data)
     assert update_sync_gateway_user(user_in_sync)
     return user
 
@@ -114,8 +143,6 @@ def get_users(bucket: Bucket, *, skip=0, limit=100):
     users = []
     for item in doc_results:
         data = item[COUCHBASE_BUCKET_NAME]
-        doc_id = item["id"]
         user = UserInDB(**data)
-        user.Meta.key = doc_id
         users.append(user)
     return users
