@@ -12,7 +12,7 @@ stages:
 tests:
   stage: test
   script:
-    - sh ./script-test.sh
+    - sh ./scripts/test.sh
   tags:
     - build
     - test
@@ -20,7 +20,7 @@ tests:
 build-stag:
   stage: build
   script:
-    - TAG=stag FRONTEND_ENV=staging sh ./script-build-push.sh
+    - TAG=stag FRONTEND_ENV=staging sh ./scripts/build-push.sh
   only:
     - master
   tags:
@@ -30,7 +30,7 @@ build-stag:
 build-prod:
   stage: build
   script:
-    - TAG=prod FRONTEND_ENV=production sh ./script-build-push.sh
+    - TAG=prod FRONTEND_ENV=production sh ./scripts/build-push.sh
   only:
     - production
   tags:
@@ -45,7 +45,7 @@ deploy-stag:
       TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag_staging}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_staging}}
       TAG=stag
-      sh ./script-deploy.sh
+      sh ./scripts/deploy.sh
   environment:
     name: staging
     url: https://{{cookiecutter.domain_staging}}
@@ -63,7 +63,7 @@ deploy-prod:
       TRAEFIK_TAG={{cookiecutter.traefik_constraint_tag}}
       STACK_NAME={{cookiecutter.docker_swarm_stack_name_main}}
       TAG=prod
-      sh ./script-deploy.sh
+      sh ./scripts/deploy.sh
   environment:
     name: production
     url: https://{{cookiecutter.domain_main}}
