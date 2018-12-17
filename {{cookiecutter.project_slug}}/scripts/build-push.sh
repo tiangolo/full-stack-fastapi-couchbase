@@ -5,6 +5,6 @@ set -e
 
 TAG=${TAG} \
 FRONTEND_ENV=${FRONTEND_ENV-production} \
-source ./script-build.sh
+source ./scripts/build.sh
 
 docker-compose -f docker-stack.yml push
