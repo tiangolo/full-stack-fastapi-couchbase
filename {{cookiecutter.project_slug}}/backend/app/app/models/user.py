@@ -8,7 +8,6 @@ from app.models.role import RoleEnum
 
 # Shared properties
 class UserBase(BaseModel):
-    username: str
     email: Optional[str] = None
     admin_roles: Optional[List[Union[str, RoleEnum]]] = None
     admin_channels: Optional[List[Union[str, RoleEnum]]] = None
@@ -16,6 +15,7 @@ class UserBase(BaseModel):
 
 
 class UserBaseInDB(UserBase):
+    username: str
     full_name: Optional[str] = None
 
 
