@@ -59,7 +59,6 @@ def route_users_post(
             status_code=400,
             detail="The user with this username already exists in the system.",
         )
-    bucket = get_default_bucket()
     user = upsert_user(bucket, user_in, persist_to=1)
     if config.EMAILS_ENABLED and user_in.email:
         send_new_account_email(
