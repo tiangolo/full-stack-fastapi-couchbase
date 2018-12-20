@@ -2,6 +2,8 @@ import logging
 
 from app.core.config import (
     COUCHBASE_BUCKET_NAME,
+    COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR,
+    COUCHBASE_FULL_TEXT_PORT,
     COUCHBASE_HOST,
     COUCHBASE_MEMORY_QUOTA_MB,
     COUCHBASE_PASSWORD,
@@ -24,6 +26,7 @@ from app.db.database import (
     ensure_create_type_index,
     get_bucket,
 )
+from app.db.full_text_search_utils import ensure_create_full_text_indexes
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate
 
@@ -64,6 +67,15 @@ def init_db():
     logging.info("before ensure_create_type_index")
     ensure_create_type_index(bucket)
     logging.info("after ensure_create_type_index")
+    logging.info("before ensure_create_full_text_indexes")
+    ensure_create_full_text_indexes(
+        index_dir=COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR,
+        username=COUCHBASE_USER,
+        password=COUCHBASE_PASSWORD,
+        host=COUCHBASE_HOST,
+        port=COUCHBASE_FULL_TEXT_PORT,
+    )
+    logging.info("after ensure_create_full_text_indexes")
     logging.info("before ensure_create_couchbase_app_user sync")
     ensure_create_couchbase_user(
         cluster_url=cluster_url,

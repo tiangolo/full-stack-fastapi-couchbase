@@ -1,8 +1,6 @@
-# Installed packages
 import requests
 from fastapi.encoders import jsonable_encoder
 
-# Install app code
 from app.core.config import (
     COUCHBASE_BUCKET_NAME,
     COUCHBASE_DURABILITY_TIMEOUT_SECS,
@@ -11,13 +9,22 @@ from app.core.config import (
     COUCHBASE_SYNC_GATEWAY_PORT,
 )
 from app.core.security import get_password_hash, verify_password
-from app.crud.utils import ensure_enums_to_strs, get_all_documents_by_type
+from app.crud.utils import (
+    ensure_enums_to_strs,
+    generate_new_id,
+    get_all_documents_by_type,
+    get_doc,
+    get_docs,
+    results_to_model,
+    search_docs,
+)
 from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate, UserInDB, UserInUpdate, UserSyncIn
 from couchbase.bucket import Bucket
 from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
 
+full_text_index_name = "users"
 
 def get_user_doc_id(username):
     return f"userprofile::{username}"
@@ -25,11 +32,7 @@ def get_user_doc_id(username):
 
 def get_user(bucket: Bucket, username: str):
     doc_id = get_user_doc_id(username)
-    result = bucket.get(doc_id, quiet=True)
-    if not result.value:
-        return None
-    user = UserInDB(**result.value)
-    return user
+    return get_doc(bucket=bucket, doc_id=doc_id, doc_model=UserInDB)
 
 
 def get_user_by_email(bucket: Bucket, email: str):
@@ -38,12 +41,8 @@ def get_user_by_email(bucket: Bucket, email: str):
         query_str, bucket=COUCHBASE_BUCKET_NAME, type=USERPROFILE_DOC_TYPE, email=email
     )
     q.consistency = CONSISTENCY_REQUEST
-    doc_results = bucket.n1ql_query(q)  # type: N1QLRequest
-    users = []
-    for item in doc_results:
-        data = item[COUCHBASE_BUCKET_NAME]
-        user = UserInDB(**data)
-        users.append(user)
+    doc_results = bucket.n1ql_query(q)
+    users = results_to_model(doc_results, doc_model=UserInDB)
     if not users:
         return None
     return users[0]
@@ -137,12 +136,22 @@ def check_if_user_is_superuser(user: UserInDB):
 
 
 def get_users(bucket: Bucket, *, skip=0, limit=100):
-    doc_results = get_all_documents_by_type(
-        bucket, doc_type=USERPROFILE_DOC_TYPE, skip=skip, limit=limit
+    users = get_docs(
+        bucket=bucket,
+        doc_type=USERPROFILE_DOC_TYPE,
+        doc_model=UserInDB,
+        skip=skip,
+        limit=limit,
     )
-    users = []
-    for item in doc_results:
-        data = item[COUCHBASE_BUCKET_NAME]
-        user = UserInDB(**data)
-        users.append(user)
+    return users
+
+def search_users(bucket: Bucket, *, query_string: str, skip=0, limit=100):
+    users = search_docs(
+        bucket=bucket,
+        query_string=query_string,
+        index_name=full_text_index_name,
+        doc_model=UserInDB,
+        skip=skip,
+        limit=limit,
+    )
     return users

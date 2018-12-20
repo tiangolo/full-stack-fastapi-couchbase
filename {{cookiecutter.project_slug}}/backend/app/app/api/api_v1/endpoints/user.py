@@ -10,6 +10,7 @@ from app.crud.user import (
     check_if_user_is_active,
     check_if_user_is_superuser,
     get_user,
+    search_users,
     get_users,
     update_user,
     upsert_user,
@@ -36,6 +37,27 @@ def route_users_get(
         )
     bucket = get_default_bucket()
     users = get_users(bucket, skip=skip, limit=limit)
+    return users
+
+
+@router.get("/users/search/", tags=["users"], response_model=List[User])
+def route_search_users(
+    q: str, skip: int = 0, limit: int = 100, current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Search users, use Bleve Query String syntax: http://blevesearch.com/docs/Query-String-Query/
+
+    For typeahead sufix with `*`. For example, a query with: `email:johnd*` will match users with
+    email `johndoe@example.com`, `johndid@example.net`, etc.
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    elif not check_if_user_is_superuser(current_user):
+        raise HTTPException(
+            status_code=400, detail="The user doesn't have enough privileges"
+        )
+    bucket = get_default_bucket()
+    users = search_users(bucket=bucket, query_string=q, skip=skip, limit=limit)
     return users
 
 

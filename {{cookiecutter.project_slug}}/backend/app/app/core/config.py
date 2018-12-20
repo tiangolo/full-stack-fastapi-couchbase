@@ -31,6 +31,7 @@ COUCHBASE_INDEX_MEMORY_QUOTA_MB = os.getenv("COUCHBASE_INDEX_MEMORY_QUOTA_MB" "2
 COUCHBASE_FTS_MEMORY_QUOTA_MB = os.getenv("COUCHBASE_FTS_MEMORY_QUOTA_MB", "256")
 COUCHBASE_HOST = os.getenv("COUCHBASE_HOST", "couchbase")
 COUCHBASE_PORT = os.getenv("COUCHBASE_PORT", "8091")
+COUCHBASE_FULL_TEXT_PORT = os.getenv("COUCHBASE_FULL_TEXT_PORT", "8094")
 COUCHBASE_ENTERPRISE = getenv_boolean("COUCHBASE_ENTERPRISE")
 COUCHBASE_USER = os.getenv("COUCHBASE_USER", "Administrator")
 COUCHBASE_PASSWORD = os.getenv("COUCHBASE_PASSWORD", "password")
@@ -52,6 +53,8 @@ COUCHBASE_N1QL_TIMEOUT_SECS = 300.0
 COUCHBASE_CORS_ORIGINS = os.getenv("COUCHBASE_CORS_ORIGINS")
 # a string of origins separated by commas, e.g: "http://localhost:5984, http://localhost, http://localhost:4200, http://localhost:3000, http://localhost:8080, http://dev.couchbase-project.com, https://stag.couchbase-project.com, https://db.stag.couchbase-project.com, https://couchbase-project.com, https://db.couchbase-project.com, http://local.dockertoolbox.tiangolo.com, http://local.dockertoolbox.tiangolo.com:5984"
 COUCHBASE_AUTH_TIMEOUT = ACCESS_TOKEN_EXPIRE_MINUTES * 60
+
+COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR = "/app/app/search_index_definitions/"
 
 SMTP_TLS = getenv_boolean("SMTP_TLS", True)
 SMTP_PORT = None

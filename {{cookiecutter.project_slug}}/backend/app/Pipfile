@@ -20,6 +20,12 @@ pyjwt = "*"
 python-multipart = "*"
 email-validator = "*"
 requests = "*"
+celery = "==4.1.1"
+passlib = {extras = ["bcrypt"],version = "*"}
+tenacity = "*"
+pydantic = "*"
+couchbase = "*"
+emails = "*"
 
 [requires]
 python_version = "3.6"

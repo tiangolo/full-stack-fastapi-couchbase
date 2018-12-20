@@ -61,6 +61,18 @@ If you need to install any additional package to the worker, add it to the file 
 
 There is an `.env` file that has some Docker Compose default values that allow you to just run `docker-compose up -d` and start working, while still being able to use and share the same Docker Compose files for deployment, avoiding repetition of code and configuration as much as possible.
 
+### Full Text Search
+
+After starting your stack with Docker Compose, go to the Couchbase admin user interface. For example, at: http://localhost:8091.
+
+Go to the search section, and perform all the steps in the official guide: https://docs.couchbase.com/server/6.0/fts/fts-creating-indexes.html
+
+But before saving the index definition, copy the JSON contents and save them to a `.json` file inside of `./backend/app/app/search_index_definitions/` (for example, `items_01.json`), besides `users_01.json` and `users.json`.
+
+The same way you can create Full Text Search "aliases", you can copy `users.json` as an example.
+
+All the index definition `.json` files in that directory will be automatically created as Full Text Search indexes during the backend startup process.
+
 ### Docker Compose Override
 
 During development, you can change Docker Compose settings that will only affect the local development environment, in the files `docker-compose.dev.*.yml`.
