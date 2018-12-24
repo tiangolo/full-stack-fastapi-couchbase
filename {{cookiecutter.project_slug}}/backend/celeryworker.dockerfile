@@ -5,7 +5,7 @@ RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
 RUN echo "deb http://packages.couchbase.com/ubuntu stretch stretch/main" > /etc/apt/sources.list.d/couchbase.list
 RUN apt-get update && apt-get install -y libcouchbase-dev build-essential
 
-RUN pip install raven celery==4.1.1 passlib[bcrypt] tenacity requests fastapi pydantic couchbase emails pyjwt email_validator
+RUN pip install raven celery==4.1.1 passlib[bcrypt] tenacity requests fastapi>=0.1.13 pydantic couchbase emails pyjwt email_validator
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
