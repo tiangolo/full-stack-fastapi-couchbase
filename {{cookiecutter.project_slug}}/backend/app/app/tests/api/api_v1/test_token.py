@@ -1,7 +1,5 @@
-# Import installed packages
 import requests
 
-# Import app code
 from app.core import config
 from app.tests.utils.utils import get_server_api
 

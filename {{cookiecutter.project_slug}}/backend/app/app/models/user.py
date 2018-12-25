@@ -19,14 +19,14 @@ class UserBaseInDB(UserBase):
     full_name: Optional[str] = None
 
 
-# Additional properties to receive via API
+# Properties to receive via API on creation
 class UserInCreate(UserBaseInDB):
     password: str
     admin_roles: List[Union[str, RoleEnum]] = []
     admin_channels: List[Union[str, RoleEnum]] = []
     disabled: bool = False
 
-
+# Properties to receive via API on update
 class UserInUpdate(UserBaseInDB):
     password: Optional[str] = None
 

@@ -1,4 +1,3 @@
-# Standard library
 import random
 import string
 

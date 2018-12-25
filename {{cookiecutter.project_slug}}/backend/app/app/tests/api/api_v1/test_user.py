@@ -1,6 +1,3 @@
-# Standard library packages
-
-# Installed packages
 import requests
 
 from app.core import config
@@ -8,7 +5,6 @@ from app.crud.user import get_user, upsert_user
 from app.db.database import get_default_bucket
 from app.models.user import UserInCreate
 from app.tests.utils.user import user_authentication_headers
-# App code
 from app.tests.utils.utils import get_server_api, random_lower_string
 
 
