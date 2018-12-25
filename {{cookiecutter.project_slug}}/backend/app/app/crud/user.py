@@ -1,4 +1,6 @@
 import requests
+from couchbase.bucket import Bucket
+from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
 from fastapi.encoders import jsonable_encoder
 
 from app.core.config import (
@@ -17,14 +19,15 @@ from app.crud.utils import (
     get_docs,
     results_to_model,
     search_docs,
+    search_results,
 )
 from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate, UserInDB, UserInUpdate, UserSyncIn
-from couchbase.bucket import Bucket
-from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
+
 
 full_text_index_name = "users"
+
 
 def get_user_doc_id(username):
     return f"userprofile::{username}"
@@ -145,8 +148,19 @@ def get_users(bucket: Bucket, *, skip=0, limit=100):
     )
     return users
 
-def search_users(bucket: Bucket, *, query_string: str, skip=0, limit=100):
+def search_user_docs(bucket: Bucket, *, query_string: str, skip=0, limit=100):
     users = search_docs(
+        bucket=bucket,
+        query_string=query_string,
+        index_name=full_text_index_name,
+        doc_model=UserInDB,
+        skip=skip,
+        limit=limit,
+    )
+    return users
+
+def search_users(bucket: Bucket, *, query_string: str, skip=0, limit=100):
+    users = search_results(
         bucket=bucket,
         query_string=query_string,
         index_name=full_text_index_name,

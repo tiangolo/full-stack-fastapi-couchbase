@@ -3,10 +3,11 @@ from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Union
 
+import emails
 import jwt
+from emails.template import JinjaTemplate
 from jwt.exceptions import InvalidTokenError
 
-import emails
 from app.core.config import (
     EMAIL_RESET_TOKEN_EXPIRE_HOURS,
     EMAIL_TEMPLATES_DIR,
@@ -22,7 +23,6 @@ from app.core.config import (
     SMTP_TLS,
     SMTP_USER,
 )
-from emails.template import JinjaTemplate
 
 password_reset_jwt_subject = "preset"
 

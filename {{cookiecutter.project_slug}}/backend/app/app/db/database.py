@@ -1,3 +1,7 @@
+from couchbase import LOCKMODE_WAIT
+from couchbase.bucket import Bucket
+from couchbase.cluster import Cluster, PasswordAuthenticator
+
 from app.core.config import (
     COUCHBASE_BUCKET_NAME,
     COUCHBASE_HOST,
@@ -8,10 +12,6 @@ from app.core.config import (
     COUCHBASE_USER,
 )
 from app.db.couchbase_utils import get_cluster_couchbase_url
-from couchbase import LOCKMODE_WAIT
-# Types
-from couchbase.bucket import Bucket
-from couchbase.cluster import Cluster, PasswordAuthenticator
 
 
 def get_default_bucket():

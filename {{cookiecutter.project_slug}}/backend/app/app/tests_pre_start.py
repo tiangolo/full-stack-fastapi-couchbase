@@ -1,7 +1,9 @@
 import logging
 
-from app.tests.api.api_v1.test_token import test_get_access_token
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
+
+from app.tests.api.api_v1.test_token import test_get_access_token
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -18,6 +20,7 @@ wait_seconds = 1
 )
 def init():
     init_tests()
+
 
 def init_tests():
     # Check Couchbase is awake

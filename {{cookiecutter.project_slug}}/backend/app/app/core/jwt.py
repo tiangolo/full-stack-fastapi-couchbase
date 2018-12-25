@@ -29,6 +29,10 @@ def get_current_user(token: str = Security(reusable_oauth2)):
         )
     bucket = get_default_bucket()
     user = get_user(bucket, username=token_data.username)
+    if not user:
+        raise HTTPException(
+            status_code=404, detail="User not found"
+        )
     return user
 
 

@@ -1,4 +1,3 @@
-# App code
 from fastapi.encoders import jsonable_encoder
 
 from app.crud.user import (
