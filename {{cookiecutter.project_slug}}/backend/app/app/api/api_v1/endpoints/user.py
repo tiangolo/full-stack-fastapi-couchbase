@@ -10,8 +10,8 @@ from app.crud.user import (
     check_if_user_is_active,
     check_if_user_is_superuser,
     get_user,
-    search_users,
     get_users,
+    search_users,
     update_user,
     upsert_user,
 )

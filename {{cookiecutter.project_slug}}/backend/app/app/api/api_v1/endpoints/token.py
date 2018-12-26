@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Body, Depends, Form
+from fastapi import APIRouter, Depends, Form
 from starlette.exceptions import HTTPException
 
 from app.core import config

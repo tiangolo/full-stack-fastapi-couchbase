@@ -3,9 +3,10 @@ from enum import Enum
 from typing import List, Sequence, Type, Union
 
 from couchbase.bucket import Bucket
-from couchbase.fulltext import QueryStringQuery
+from couchbase.fulltext import MatchAllQuery, QueryStringQuery
 from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
 from pydantic import BaseModel
+from pydantic.fields import Field, Shape
 
 from app.core.config import COUCHBASE_BUCKET_NAME
 
@@ -53,11 +54,25 @@ def results_to_model(results_from_couchbase: list, *, doc_model: Type[BaseModel]
     return items
 
 
-def search_results_to_model(results_from_couchbase: list, *, doc_model: Type[BaseModel]):
+def search_results_to_model(
+    results_from_couchbase: list, *, doc_model: Type[BaseModel]
+):
     items = []
     for doc in results_from_couchbase:
-        data = doc["fields"]
-        doc = doc_model(**data)
+        data = doc.get("fields")
+        if not data:
+            continue
+        data_nones = {}
+        for key, value in data.items():
+            field: Field = doc_model.__fields__[key]
+            if not value:
+                value = None
+            elif field.shape in {Shape.LIST, Shape.SET, Shape.TUPLE} and not isinstance(
+                value, list
+            ):
+                value = [value]
+            data_nones[key] = value
+        doc = doc_model(**data_nones)
         items.append(doc)
     return items
 
@@ -103,6 +118,31 @@ def search_get_results(
     skip: int = 0,
     limit: int = 100,
 ):
+    if query_string:
+        query = QueryStringQuery(query_string)
+    else:
+        query = MatchAllQuery()
+    hits = bucket.search(index_name, query, fields=["*"], skip=skip, limit=limit)
+    docs = []
+    for hit in hits:
+        docs.append(hit)
+    return docs
+
+
+def search_get_results_by_type(
+    bucket: Bucket,
+    *,
+    query_string: str,
+    index_name: str,
+    doc_type: str,
+    skip: int = 0,
+    limit: int = 100,
+):
+    type_filter = f"type:{doc_type}"
+    if not query_string:
+        query_string = type_filter
+    if query_string and type_filter not in query_string:
+        query_string += f" {type_filter}"
     query = QueryStringQuery(query_string)
     hits = bucket.search(index_name, query, fields=["*"], skip=skip, limit=limit)
     docs = []
@@ -146,6 +186,27 @@ def search_results(
         bucket=bucket,
         query_string=query_string,
         index_name=index_name,
+        skip=skip,
+        limit=limit,
+    )
+    return search_results_to_model(doc_results, doc_model=doc_model)
+
+
+def search_results_by_type(
+    bucket: Bucket,
+    *,
+    query_string: str,
+    index_name: str,
+    doc_type: str,
+    doc_model: Type[BaseModel],
+    skip=0,
+    limit=100,
+):
+    doc_results = search_get_results_by_type(
+        bucket=bucket,
+        query_string=query_string,
+        index_name=index_name,
+        doc_type=doc_type,
         skip=skip,
         limit=limit,
     )

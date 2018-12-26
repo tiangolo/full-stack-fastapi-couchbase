@@ -18,8 +18,7 @@ from app.crud.utils import (
     get_doc,
     get_docs,
     results_to_model,
-    search_docs,
-    search_results,
+    search_results_by_type,
 )
 from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
@@ -160,10 +159,11 @@ def search_user_docs(bucket: Bucket, *, query_string: str, skip=0, limit=100):
     return users
 
 def search_users(bucket: Bucket, *, query_string: str, skip=0, limit=100):
-    users = search_results(
+    users = search_results_by_type(
         bucket=bucket,
         query_string=query_string,
         index_name=full_text_index_name,
+        doc_type=USERPROFILE_DOC_TYPE,
         doc_model=UserInDB,
         skip=skip,
         limit=limit,

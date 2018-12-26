@@ -38,6 +38,21 @@
                     "dynamic": false,
                     "enabled": true,
                     "properties": {
+                        "type": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "type",
+                                    "type": "text",
+                                    "analyzer": "keyword",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": false,
+                                    "include_in_all": false
+                                }
+                            ]
+                        },
                         "admin_channels": {
                             "enabled": true,
                             "dynamic": false,
