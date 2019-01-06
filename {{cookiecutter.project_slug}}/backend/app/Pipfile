@@ -5,13 +5,11 @@ verify_ssl = true
 
 [dev-packages]
 mypy = "*"
-jedi = "*"
 black = "*"
-prospector = "*"
-rope = "*"
 jupyter = "*"
 isort = "*"
 autoflake = "*"
+flake8 = "*"
 
 [packages]
 fastapi = "*"
