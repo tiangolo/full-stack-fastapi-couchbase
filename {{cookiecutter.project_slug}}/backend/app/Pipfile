@@ -10,6 +10,7 @@ jupyter = "*"
 isort = "*"
 autoflake = "*"
 flake8 = "*"
+pytest = "*"
 
 [packages]
 fastapi = "*"
@@ -24,6 +25,7 @@ tenacity = "*"
 pydantic = "*"
 couchbase = "*"
 emails = "*"
+raven = "*"
 
 [requires]
 python_version = "3.6"

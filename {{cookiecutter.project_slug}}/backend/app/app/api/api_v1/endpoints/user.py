@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Body, Depends
 from pydantic.types import EmailStr
 from starlette.exceptions import HTTPException
 
@@ -42,7 +42,10 @@ def route_users_get(
 
 @router.get("/users/search/", tags=["users"], response_model=List[User])
 def route_search_users(
-    q: str, skip: int = 0, limit: int = 100, current_user: UserInDB = Depends(get_current_user)
+    q: str,
+    skip: int = 0,
+    limit: int = 100,
+    current_user: UserInDB = Depends(get_current_user),
 ):
     """
     Search users, use Bleve Query String syntax: http://blevesearch.com/docs/Query-String-Query/
@@ -94,7 +97,7 @@ def route_users_put(
     *,
     username: str,
     user_in: UserInUpdate,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: UserInDB = Depends(get_current_user),
 ):
     """
     Update a user
@@ -123,7 +126,7 @@ def route_users_me_put(
     password: str = None,
     full_name: str = None,
     email: EmailStr = None,
-    current_user: UserInDB = Depends(get_current_user)
+    current_user: UserInDB = Depends(get_current_user),
 ):
     """
     Update own user
@@ -174,7 +177,11 @@ def route_users_id_get(
 
 @router.post("/users/open", tags=["users"], response_model=User)
 def route_users_post_open(
-    *, username: str, password: str, email: EmailStr = None, full_name: str = None
+    *,
+    username: str = Body(...),
+    password: str = Body(...),
+    email: EmailStr = Body(None),
+    full_name: str = Body(None),
 ):
     """
     Create new user without the need to be logged in

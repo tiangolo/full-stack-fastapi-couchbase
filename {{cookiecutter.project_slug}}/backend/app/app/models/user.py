@@ -26,6 +26,7 @@ class UserInCreate(UserBaseInDB):
     admin_channels: List[Union[str, RoleEnum]] = []
     disabled: bool = False
 
+
 # Properties to receive via API on update
 class UserInUpdate(UserBaseInDB):
     password: Optional[str] = None
