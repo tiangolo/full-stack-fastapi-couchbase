@@ -92,34 +92,6 @@ def route_users_post(
     return user
 
 
-@router.put("/users/{username}", tags=["users"], response_model=User)
-def route_users_put(
-    *,
-    username: str,
-    user_in: UserInUpdate,
-    current_user: UserInDB = Depends(get_current_user),
-):
-    """
-    Update a user
-    """
-    if not check_if_user_is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    elif not check_if_user_is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    bucket = get_default_bucket()
-    user = get_user(bucket, username)
-
-    if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="The user with this username does not exist in the system",
-        )
-    user = update_user(bucket, user_in)
-    return user
-
-
 @router.put("/users/me", tags=["users"], response_model=User)
 def route_users_me_put(
     *,
@@ -155,26 +127,6 @@ def route_users_me_get(current_user: UserInDB = Depends(get_current_user)):
     return current_user
 
 
-@router.get("/users/{username}", tags=["users"], response_model=User)
-def route_users_id_get(
-    username: str, current_user: UserInDB = Depends(get_current_user)
-):
-    """
-    Get a specific user by username (email)
-    """
-    if not check_if_user_is_active(current_user):
-        raise HTTPException(status_code=400, detail="Inactive user")
-    bucket = get_default_bucket()
-    user = get_user(bucket, username)
-    if user == current_user:
-        return user
-    if not check_if_user_is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
-    return user
-
-
 @router.post("/users/open", tags=["users"], response_model=User)
 def route_users_post_open(
     *,
@@ -202,4 +154,52 @@ def route_users_post_open(
         username=username, password=password, email=email, full_name=full_name
     )
     user = upsert_user(bucket, user_in, persist_to=1)
+    return user
+
+
+@router.get("/users/{username}", tags=["users"], response_model=User)
+def route_users_id_get(
+    username: str, current_user: UserInDB = Depends(get_current_user)
+):
+    """
+    Get a specific user by username (email)
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    bucket = get_default_bucket()
+    user = get_user(bucket, username)
+    if user == current_user:
+        return user
+    if not check_if_user_is_superuser(current_user):
+        raise HTTPException(
+            status_code=400, detail="The user doesn't have enough privileges"
+        )
+    return user
+
+
+@router.put("/users/{username}", tags=["users"], response_model=User)
+def route_users_put(
+    *,
+    username: str,
+    user_in: UserInUpdate,
+    current_user: UserInDB = Depends(get_current_user),
+):
+    """
+    Update a user
+    """
+    if not check_if_user_is_active(current_user):
+        raise HTTPException(status_code=400, detail="Inactive user")
+    elif not check_if_user_is_superuser(current_user):
+        raise HTTPException(
+            status_code=400, detail="The user doesn't have enough privileges"
+        )
+    bucket = get_default_bucket()
+    user = get_user(bucket, username)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="The user with this username does not exist in the system",
+        )
+    user = update_user(bucket, user_in)
     return user
