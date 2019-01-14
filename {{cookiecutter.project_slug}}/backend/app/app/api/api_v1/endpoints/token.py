@@ -1,6 +1,7 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, Form
+from fastapi import APIRouter, Depends
+from fastapi.security import OAuth2PasswordRequestForm
 from starlette.exceptions import HTTPException
 
 from app.core import config
@@ -26,12 +27,12 @@ router = APIRouter()
 
 
 @router.post("/login/access-token", response_model=Token, tags=["login"])
-def route_login_access_token(username: str = Form(...), password: str = Form(...)):
+def route_login_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     OAuth2 compatible token login, get an access token for future requests
     """
     bucket = get_default_bucket()
-    user = authenticate_user(bucket, username, password)
+    user = authenticate_user(bucket, form_data.username, form_data.password)
     if not user:
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not check_if_user_is_active(user):
@@ -39,7 +40,7 @@ def route_login_access_token(username: str = Form(...), password: str = Form(...
     access_token_expires = timedelta(minutes=config.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {
         "access_token": create_access_token(
-            data={"username": username}, expires_delta=access_token_expires
+            data={"username": form_data.username}, expires_delta=access_token_expires
         ),
         "token_type": "bearer",
     }
