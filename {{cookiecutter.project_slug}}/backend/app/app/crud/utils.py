@@ -35,14 +35,15 @@ def get_all_documents_by_type(bucket: Bucket, *, doc_type: str, skip=0, limit=10
     return result
 
 
-def get_documents_by_keys(bucket: Bucket, *, keys: List[str], skip=0, limit=100):
-    query_str = f"SELECT *, META().id as id FROM {COUCHBASE_BUCKET_NAME} USE KEYS $keys LIMIT $limit OFFSET $skip;"
-    q = N1QLQuery(
-        query_str, bucket=COUCHBASE_BUCKET_NAME, keys=keys, limit=limit, skip=skip
-    )
-    q.consistency = CONSISTENCY_REQUEST
-    result = bucket.n1ql_query(q)
-    return result
+def get_documents_by_keys(
+    bucket: Bucket, *, keys: List[str], doc_model=Type[BaseModel]
+):
+    results = bucket.get_multi(keys, quiet=True)
+    docs = []
+    for result in results.values():
+        doc = doc_model(**result.value)
+        docs.append(doc)
+    return docs
 
 
 def results_to_model(results_from_couchbase: list, *, doc_model: Type[BaseModel]):
@@ -167,10 +168,12 @@ def search_docs(
         skip=skip,
         limit=limit,
     )
+    if not keys:
+        return []
     doc_results = get_documents_by_keys(
-        bucket=bucket, keys=keys, skip=skip, limit=limit
+        bucket=bucket, keys=keys, doc_model=doc_model
     )
-    return results_to_model(doc_results, doc_model=doc_model)
+    return doc_results
 
 
 def search_results(
