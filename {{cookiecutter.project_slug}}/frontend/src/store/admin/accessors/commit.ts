@@ -1,4 +1,4 @@
-import { getStoreAccessors } from 'vuex-typescript';
+import { getStoreAccessors } from 'typesafe-vuex';
 import { State } from '@/store/state';
 import { mutations } from '../mutations';
 import { AdminState } from '../state';

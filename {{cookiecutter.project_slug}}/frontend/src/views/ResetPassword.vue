@@ -63,7 +63,7 @@ export default class UserProfileEdit extends Vue {
   }
 
   public checkToken() {
-    const token = this.$router.currentRoute.query.token;
+    const token = (this.$router.currentRoute.query.token as string);
     if (!token) {
       commitAddNotification(this.$store, {
         content: 'No token provided in the URL, start a new password recovery',

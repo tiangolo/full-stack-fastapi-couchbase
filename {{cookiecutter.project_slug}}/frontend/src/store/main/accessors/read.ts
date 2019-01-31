@@ -1,4 +1,4 @@
-import { getStoreAccessors } from 'vuex-typescript';
+import { getStoreAccessors } from 'typesafe-vuex';
 import { MainState } from '../state';
 import { State } from '@/store/state';
 import { getters } from '../getters';
