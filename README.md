@@ -20,6 +20,9 @@ Generate a backend and frontend stack using Python, including interactive API do
     * **Robust**: Get production-ready code. With automatic interactive documentation.
     * **Standards-based**: Based on (and fully compatible with) the open standards for APIs: <a href="https://github.com/OAI/OpenAPI-Specification" target="_blank">OpenAPI</a> and <a href="http://json-schema.org/" target="_blank">JSON Schema</a>.
     * [**Many other features**](https://github.com/tiangolo/fastapi) including automatic validation, serialization, interactive documentation, authentication with OAuth2 JWT tokens, etc.
+* Secure password hashing by default
+* JWT token authentication
+* CORS (Cross Origin Resource Sharing)
 * **Celery** worker that can import and use code from the rest of the backend selectively (you don't have to install the complete app in each worker).
 * **NoSQL Couchbase** database that supports direct synchronization via Couchbase Sync Gateway for offline-first applications.
 * **Full Text Search** integrated, using Couchbase.
