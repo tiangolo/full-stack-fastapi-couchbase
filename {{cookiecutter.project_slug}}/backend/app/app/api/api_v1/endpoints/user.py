@@ -95,9 +95,9 @@ def route_users_post(
 @router.put("/users/me", tags=["users"], response_model=User)
 def route_users_me_put(
     *,
-    password: str = None,
-    full_name: str = None,
-    email: EmailStr = None,
+    password: str = Body(None),
+    full_name: str = Body(None),
+    email: EmailStr = Body(None),
     current_user: UserInDB = Depends(get_current_user),
 ):
     """
