@@ -130,6 +130,10 @@ Please refer to <a href="https://dockerswarm.rocks" target="_blank">DockerSwarm.
 
 After using this generator, your new project (the directory created) will contain an extensive `README.md` with instructions for development, deployment, etc. You can pre-read [the project `README.md` template here too](./{{cookiecutter.project_slug}}/README.md).
 
+## Sibling project generators
+
+* Based on PostgreSQL: [https://github.com/tiangolo/full-stack-fastapi-postgresql](https://github.com/tiangolo/full-stack-fastapi-postgresql).
+
 ## License
 
 This project is licensed under the terms of the MIT license.
