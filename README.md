@@ -138,6 +138,8 @@ After using this generator, your new project (the directory created) will contai
 
 ### 0.2.0
 
+**<a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/7" target="_blank">PR #7</a>**:
+
 * Simplify and update backend `Dockerfile`s.
 * Refactor and simplify backend code, improve naming, imports, modules and "namespaces".
 * Improve and simplify Vuex integration with TypeScript accessors.
