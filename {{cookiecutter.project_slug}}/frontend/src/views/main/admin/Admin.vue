@@ -5,8 +5,8 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { store } from '@/store';
-import { readHasAdminAccess } from '@/store/main/accessors';
-import { dispatchGetRoles } from '@/store/admin/accessors';
+import { readHasAdminAccess } from '@/store/main/getters';
+import { dispatchGetRoles } from '@/store/admin/actions';
 
 const routeGuardAdmin = async (to, from, next) => {
   if (!readHasAdminAccess(store)) {
@@ -17,7 +17,7 @@ const routeGuardAdmin = async (to, from, next) => {
 };
 
 @Component
-export default class Start extends Vue {
+export default class Admin extends Vue {
   public beforeRouteEnter(to, from, next) {
     routeGuardAdmin(to, from, next);
   }

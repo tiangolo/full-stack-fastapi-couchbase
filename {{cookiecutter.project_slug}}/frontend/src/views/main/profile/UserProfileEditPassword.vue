@@ -8,7 +8,7 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">Username</div>
-            <div class="title primary--text text--darken-2" v-if="userProfile.name">{{userProfile.name}}</div>
+            <div class="title primary--text text--darken-2" v-if="userProfile.username">{{userProfile.username}}</div>
             <div class="title primary--text text--darken-2" v-else>-----</div>
           </div>
           <v-form ref="form">
@@ -34,12 +34,15 @@
               v-model="password2"
               :error-messages="errors.first('password_confirmation')">
             </v-text-field>
-            <v-btn @click="cancel">Cancel</v-btn>
-            <v-btn @click="reset">Reset</v-btn>
-            <v-btn @click="submit" :disabled="!valid">Save</v-btn>
           </v-form>
         </template>
       </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="cancel">Cancel</v-btn>
+        <v-btn @click="reset">Reset</v-btn>
+        <v-btn @click="submit" :disabled="!valid">Save</v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
 </template>
@@ -48,7 +51,8 @@
 import { Component, Vue } from 'vue-property-decorator';
 import { Store } from 'vuex';
 import { IUserProfileUpdate } from '@/interfaces';
-import { dispatchUpdateUserProfile, readUserProfile } from '@/store/main/accessors';
+import { readUserProfile } from '@/store/main/getters';
+import { dispatchUpdateUserProfile } from '@/store/main/actions';
 
 @Component
 export default class UserProfileEdit extends Vue {

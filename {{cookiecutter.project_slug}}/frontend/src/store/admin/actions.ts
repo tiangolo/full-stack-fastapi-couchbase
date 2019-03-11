@@ -1,14 +1,12 @@
 import { api } from '@/api';
 import { ActionContext } from 'vuex';
-import {
-    commitSetUsers,
-    commitSetUser,
-    commitSetRoles,
-} from './accessors/commit';
 import { IUserProfileCreate, IUserProfileUpdate } from '@/interfaces';
 import { State } from '../state';
 import { AdminState } from './state';
-import { dispatchCheckApiError, commitAddNotification, commitRemoveNotification } from '../main/accessors';
+import { getStoreAccessors } from 'typesafe-vuex';
+import { commitSetUsers, commitSetUser, commitSetRoles } from './mutations';
+import { dispatchCheckApiError } from '../main/actions';
+import { commitAddNotification, commitRemoveNotification } from '../main/mutations';
 
 type MainContext = ActionContext<AdminState, State>;
 
@@ -23,12 +21,12 @@ export const actions = {
             await dispatchCheckApiError(context, error);
         }
     },
-    async actionUpdateUser(context: MainContext, payload: { name: string, user: IUserProfileUpdate }) {
+    async actionUpdateUser(context: MainContext, payload: { username: string, user: IUserProfileUpdate }) {
         try {
             const loadingNotification = { content: 'saving', showProgress: true };
             commitAddNotification(context, loadingNotification);
             const response = (await Promise.all([
-                api.updateUser(context.rootState.main.token, payload.name, payload.user),
+                api.updateUser(context.rootState.main.token, payload.username, payload.user),
                 await new Promise((resolve, reject) => setTimeout(() => resolve(), 500)),
             ]))[0];
             commitSetUser(context, response.data);
@@ -62,3 +60,10 @@ export const actions = {
         }
     },
 };
+
+const { dispatch } = getStoreAccessors<AdminState, State>('');
+
+export const dispatchCreateUser = dispatch(actions.actionCreateUser);
+export const dispatchGetRoles = dispatch(actions.actionGetRoles);
+export const dispatchGetUsers = dispatch(actions.actionGetUsers);
+export const dispatchUpdateUser = dispatch(actions.actionUpdateUser);

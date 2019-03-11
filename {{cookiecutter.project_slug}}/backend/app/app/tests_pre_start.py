@@ -2,6 +2,7 @@ import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
+from app.db.database import get_default_bucket
 from app.tests.api.api_v1.test_token import test_get_access_token
 
 logging.basicConfig(level=logging.INFO)
@@ -18,18 +19,18 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init():
-    init_tests()
+    try:
+        # Check Couchbase is awake
+        bucket = get_default_bucket()
+        logger.info(
+            f"Database bucket connection established with bucket object: {bucket}"
+        )
 
-
-def init_tests():
-    # Check Couchbase is awake
-    from app.db.database import get_default_bucket  # noqa
-
-    bucket = get_default_bucket()
-    logger.info(f"Database bucket connection established with bucket object: {bucket}")
-
-    # Wait for API to be awake, run one simple tests to authenticate
-    test_get_access_token()
+        # Wait for API to be awake, run one simple tests to authenticate
+        test_get_access_token()
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def main():

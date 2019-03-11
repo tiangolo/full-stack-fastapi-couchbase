@@ -3,12 +3,12 @@ export interface IUserProfile {
     admin_roles: string[];
     disabled: boolean;
     email: string;
-    human_name: string;
-    name: string;
+    full_name: string;
+    username: string;
 }
 
 export interface IUserProfileUpdate {
-    human_name?: string;
+    full_name?: string;
     password?: string;
     email?: string;
     admin_channels?: string[];
@@ -17,8 +17,8 @@ export interface IUserProfileUpdate {
 }
 
 export interface IUserProfileCreate {
-    name: string;
-    human_name?: string;
+    username: string;
+    full_name?: string;
     password?: string;
     email?: string;
     admin_channels?: string[];

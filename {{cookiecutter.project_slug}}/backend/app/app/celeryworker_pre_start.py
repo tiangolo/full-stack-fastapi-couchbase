@@ -2,6 +2,8 @@ import logging
 
 from tenacity import after_log, before_log, retry, stop_after_attempt, wait_fixed
 
+from app.db.database import get_default_bucket
+
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -16,11 +18,15 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init():
-    # Check Couchbase is awake
-    from app.db.database import get_default_bucket
-
-    bucket = get_default_bucket()
-    logger.info(f"Database bucket connection established with bucket object: {bucket}")
+    try:
+        # Check Couchbase is awake
+        bucket = get_default_bucket()
+        logger.info(
+            f"Database bucket connection established with bucket object: {bucket}"
+        )
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def main():

@@ -1,12 +1,6 @@
 from fastapi.encoders import jsonable_encoder
 
-from app.crud.user import (
-    authenticate_user,
-    check_if_user_is_active,
-    check_if_user_is_superuser,
-    get_user,
-    upsert_user,
-)
+from app import crud
 from app.db.database import get_default_bucket
 from app.models.role import RoleEnum
 from app.models.user import UserInCreate
@@ -18,7 +12,7 @@ def test_create_user():
     password = random_lower_string()
     user_in = UserInCreate(username=email, email=email, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
     assert hasattr(user, "username")
     assert user.username == email
     assert hasattr(user, "hashed_password")
@@ -31,8 +25,10 @@ def test_authenticate_user():
     password = random_lower_string()
     user_in = UserInCreate(username=email, email=email, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    authenticated_user = authenticate_user(bucket, email, password)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    authenticated_user = crud.user.authenticate(
+        bucket, username=user_in.username, password=password
+    )
     assert authenticated_user
     assert user.username == authenticated_user.username
 
@@ -41,8 +37,8 @@ def test_not_authenticate_user():
     email = random_lower_string()
     password = random_lower_string()
     bucket = get_default_bucket()
-    user = authenticate_user(bucket, email, password)
-    assert user is False
+    user = crud.user.authenticate(bucket, username=email, password=password)
+    assert user is None
 
 
 def test_check_if_user_is_active():
@@ -50,8 +46,8 @@ def test_check_if_user_is_active():
     password = random_lower_string()
     user_in = UserInCreate(username=email, email=email, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    is_active = check_if_user_is_active(user)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    is_active = crud.user.is_active(user)
     assert is_active is True
 
 
@@ -62,8 +58,8 @@ def test_check_if_user_is_active_inactive():
         username=email, email=email, password=password, disabled=True
     )
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    is_active = check_if_user_is_active(user)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    is_active = crud.user.is_active(user)
     assert is_active is False
 
 
@@ -74,8 +70,8 @@ def test_check_if_user_is_superuser():
         username=email, email=email, password=password, admin_roles=[RoleEnum.superuser]
     )
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    is_superuser = check_if_user_is_superuser(user)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    is_superuser = crud.user.is_superuser(user)
     assert is_superuser is True
 
 
@@ -84,8 +80,8 @@ def test_check_if_user_is_superuser_normal_user():
     password = random_lower_string()
     user_in = UserInCreate(username=username, email=username, password=password)
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    is_superuser = check_if_user_is_superuser(user)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    is_superuser = crud.user.is_superuser(user)
     assert is_superuser is False
 
 
@@ -99,7 +95,7 @@ def test_get_user():
         admin_roles=[RoleEnum.superuser],
     )
     bucket = get_default_bucket()
-    user = upsert_user(bucket, user_in, persist_to=1)
-    user_2 = get_user(bucket, username)
+    user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
+    user_2 = crud.user.get(bucket, username=username)
     assert user.username == user_2.username
     assert jsonable_encoder(user) == jsonable_encoder(user_2)
