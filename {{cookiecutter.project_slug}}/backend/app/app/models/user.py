@@ -15,12 +15,13 @@ class UserBase(BaseModel):
 
 
 class UserBaseInDB(UserBase):
-    username: str
+    username: Optional[str] = None
     full_name: Optional[str] = None
 
 
 # Properties to receive via API on creation
 class UserInCreate(UserBaseInDB):
+    username: str
     password: str
     admin_roles: List[Union[str, RoleEnum]] = []
     admin_channels: List[Union[str, RoleEnum]] = []

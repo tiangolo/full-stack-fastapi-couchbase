@@ -89,7 +89,7 @@ def update_user_me(
     if email is not None:
         user_in.email = email
     bucket = get_default_bucket()
-    user = crud.user.update(bucket, user_in=user_in)
+    user = crud.user.update(bucket, username=current_user.username, user_in=user_in)
     return user
 
 
@@ -169,5 +169,5 @@ def update_user(
             status_code=404,
             detail="The user with this username does not exist in the system",
         )
-    user = crud.user.update(bucket, user_in=user_in)
+    user = crud.user.update(bucket, username=username, user_in=user_in)
     return user

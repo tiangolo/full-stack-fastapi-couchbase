@@ -72,9 +72,9 @@ def upsert_in_db(bucket: Bucket, *, user_in: UserInCreate, persist_to=0):
     return user
 
 
-def update_in_db(bucket: Bucket, *, user_in: UserInUpdate, persist_to=0):
-    user_doc_id = get_doc_id(user_in.username)
-    stored_user = get(bucket, username=user_in.username)
+def update_in_db(bucket: Bucket, *, username: str, user_in: UserInUpdate, persist_to=0):
+    user_doc_id = get_doc_id(username)
+    stored_user = get(bucket, username=username)
     for field in stored_user.fields:
         if field in user_in.fields:
             value_in = getattr(user_in, field)
@@ -98,8 +98,10 @@ def upsert(bucket: Bucket, *, user_in: UserInCreate, persist_to=0):
     return user
 
 
-def update(bucket: Bucket, *, user_in: UserInUpdate, persist_to=0):
-    user = update_in_db(bucket, user_in=user_in, persist_to=persist_to)
+def update(bucket: Bucket, *, username: str, user_in: UserInUpdate, persist_to=0):
+    user = update_in_db(
+        bucket, username=username, user_in=user_in, persist_to=persist_to
+    )
     user_in_sync_data = user.dict()
     user_in_sync_data.update({"name": user.username})
     if user_in.password:

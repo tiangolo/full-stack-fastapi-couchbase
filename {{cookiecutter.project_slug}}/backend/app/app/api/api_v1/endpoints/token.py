@@ -88,5 +88,5 @@ def reset_password(token: str, new_password: str):
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
     user_in = UserInUpdate(name=username, password=new_password)
-    user = crud.user.update(bucket, user_in=user_in)
+    user = crud.user.update(bucket, username=username, user_in=user_in)
     return {"msg": "Password updated successfully"}
