@@ -134,6 +134,19 @@ After using this generator, your new project (the directory created) will contai
 
 * Based on PostgreSQL: [https://github.com/tiangolo/full-stack-fastapi-postgresql](https://github.com/tiangolo/full-stack-fastapi-postgresql).
 
+## Release Notes
+
+### 0.2.0
+
+* Simplify and update backend `Dockerfile`s.
+* Refactor and simplify backend code, improve naming, imports, modules and "namespaces".
+* Improve and simplify Vuex integration with TypeScript accessors.
+* Standardize frontend components layout, buttons order, etc.
+* Add local development scripts (to develop this project generator itself).
+* Add logs to startup modules to detect errors early.
+* Improve FastAPI dependency utilities, to simplify and reduce code (to require a superuser).
+* Fix/update logic to update users.
+
 ## License
 
 This project is licensed under the terms of the MIT license.
