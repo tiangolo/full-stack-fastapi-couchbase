@@ -11,6 +11,7 @@ isort = "*"
 autoflake = "*"
 flake8 = "*"
 pytest = "*"
+vulture = "*"
 
 [packages]
 fastapi = "*"
@@ -26,6 +27,7 @@ pydantic = "*"
 couchbase = "*"
 emails = "*"
 raven = "*"
+jinja2 = "*"
 
 [requires]
 python_version = "3.6"
