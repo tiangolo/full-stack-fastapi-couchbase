@@ -8,14 +8,8 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">Username</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-if="userProfile.username"
-            >{{userProfile.username}}</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-else
-            >-----</div>
+            <div class="title primary--text text--darken-2" v-if="userProfile.username">{{userProfile.username}}</div>
+            <div class="title primary--text text--darken-2" v-else>-----</div>
           </div>
           <v-form
             v-model="valid"

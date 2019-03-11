@@ -8,14 +8,8 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">Username</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-if="user"
-            >{{user.username}}</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-else
-            >-----</div>
+            <div class="title primary--text text--darken-2" v-if="user">{{user.username}}</div>
+            <div class="title primary--text text--darken-2" v-else>-----</div>
           </div>
           <v-form
             v-model="valid"
@@ -37,17 +31,9 @@
               required
             ></v-text-field>
             <div class="subheading secondary--text text--lighten-2">Roles</div>
-            <v-checkbox
-              v-for="(value, role) in selectedRoles"
-              :key="role"
-              :label="role"
-              v-model="selectedRoles[role]"
-            ></v-checkbox>
+            <v-checkbox v-for="(value, role) in selectedRoles" :key="role" :label="role" v-model="selectedRoles[role]"></v-checkbox>
             <div class="subheading secondary--text text--lighten-2">Disable User <span v-if="userDisabled">(currently disabled)</span><span v-else>(currently enabled)</span></div>
-            <v-checkbox
-              :label="'Disabled'"
-              v-model="userDisabled"
-            ></v-checkbox>
+            <v-checkbox :label="'Disabled'" v-model="userDisabled"></v-checkbox>
             <v-layout align-center>
               <v-flex shrink>
                 <v-checkbox

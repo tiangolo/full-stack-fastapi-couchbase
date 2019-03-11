@@ -8,17 +8,11 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">Username</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-if="userProfile.username"
-            >{{userProfile.username}}</div>
-            <div
-              class="title primary--text text--darken-2"
-              v-else
-            >-----</div>
+            <div class="title primary--text text--darken-2" v-if="userProfile.username">{{userProfile.username}}</div>
+            <div class="title primary--text text--darken-2" v-else>-----</div>
           </div>
           <v-form ref="form">
-            <v-text-field
+            <v-text-field 
               type="password"
               ref="password"
               label="Password"
@@ -27,8 +21,7 @@
               data-vv-rules="required"
               v-validate="'required'"
               v-model="password1"
-              :error-messages="errors.first('password')"
-            >
+              :error-messages="errors.first('password')">
             </v-text-field>
             <v-text-field
               type="password"
@@ -39,8 +32,7 @@
               data-vv-as="password"
               v-validate="'required|confirmed:password'"
               v-model="password2"
-              :error-messages="errors.first('password_confirmation')"
-            >
+              :error-messages="errors.first('password_confirmation')">
             </v-text-field>
           </v-form>
         </template>
@@ -49,10 +41,7 @@
         <v-spacer></v-spacer>
         <v-btn @click="cancel">Cancel</v-btn>
         <v-btn @click="reset">Reset</v-btn>
-        <v-btn
-          @click="submit"
-          :disabled="!valid"
-        >Save</v-btn>
+        <v-btn @click="submit" :disabled="!valid">Save</v-btn>
       </v-card-actions>
     </v-card>
   </v-container>
