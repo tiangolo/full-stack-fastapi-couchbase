@@ -8,37 +8,94 @@
         <template>
           <div class="my-3">
             <div class="subheading secondary--text text--lighten-2">Username</div>
-            <div class="title primary--text text--darken-2" v-if="user">{{user.name}}</div>
-            <div class="title primary--text text--darken-2" v-else>-----</div>
+            <div
+              class="title primary--text text--darken-2"
+              v-if="user"
+            >{{user.username}}</div>
+            <div
+              class="title primary--text text--darken-2"
+              v-else
+            >-----</div>
           </div>
-          <v-form v-model="valid" ref="form" lazy-validation>
-            <v-text-field label="Full Name" v-model="fullName" required></v-text-field>
-            <v-text-field label="E-mail" type="email" v-model="email" v-validate="'required|email'" data-vv-name="email" :error-messages="errors.collect('email')" required></v-text-field>
+          <v-form
+            v-model="valid"
+            ref="form"
+            lazy-validation
+          >
+            <v-text-field
+              label="Full Name"
+              v-model="fullName"
+              required
+            ></v-text-field>
+            <v-text-field
+              label="E-mail"
+              type="email"
+              v-model="email"
+              v-validate="'required|email'"
+              data-vv-name="email"
+              :error-messages="errors.collect('email')"
+              required
+            ></v-text-field>
             <div class="subheading secondary--text text--lighten-2">Roles</div>
-            <v-checkbox v-for="(value, role) in selectedRoles" :key="role" :label="role" v-model="selectedRoles[role]"></v-checkbox>
+            <v-checkbox
+              v-for="(value, role) in selectedRoles"
+              :key="role"
+              :label="role"
+              v-model="selectedRoles[role]"
+            ></v-checkbox>
             <div class="subheading secondary--text text--lighten-2">Disable User <span v-if="userDisabled">(currently disabled)</span><span v-else>(currently enabled)</span></div>
-            <v-checkbox :label="'Disabled'" v-model="userDisabled"></v-checkbox>
+            <v-checkbox
+              :label="'Disabled'"
+              v-model="userDisabled"
+            ></v-checkbox>
             <v-layout align-center>
               <v-flex shrink>
-                <v-checkbox v-model="setPassword" class="mr-2"></v-checkbox>
+                <v-checkbox
+                  v-model="setPassword"
+                  class="mr-2"
+                ></v-checkbox>
               </v-flex>
               <v-flex>
-                <v-text-field :disabled="!setPassword" type="password" ref="password" label="Set Password" data-vv-name="password" data-vv-delay="100" v-validate="{required: setPassword}" v-model="password1" :error-messages="errors.first('password')">
+                <v-text-field
+                  :disabled="!setPassword"
+                  type="password"
+                  ref="password"
+                  label="Set Password"
+                  data-vv-name="password"
+                  data-vv-delay="100"
+                  v-validate="{required: setPassword}"
+                  v-model="password1"
+                  :error-messages="errors.first('password')"
+                >
                 </v-text-field>
-                <v-text-field v-show="setPassword" type="password" label="Confirm Password" data-vv-name="password_confirmation" data-vv-delay="100" data-vv-as="password" v-validate="{required: setPassword, confirmed: 'password'}" v-model="password2" :error-messages="errors.first('password_confirmation')">
+                <v-text-field
+                  v-show="setPassword"
+                  type="password"
+                  label="Confirm Password"
+                  data-vv-name="password_confirmation"
+                  data-vv-delay="100"
+                  data-vv-as="password"
+                  v-validate="{required: setPassword, confirmed: 'password'}"
+                  v-model="password2"
+                  :error-messages="errors.first('password_confirmation')"
+                >
                 </v-text-field>
               </v-flex>
-
             </v-layout>
-
-            <v-btn @click="submit" :disabled="!valid">
-              Save
-            </v-btn>
-            <v-btn @click="reset">Reset</v-btn>
-            <v-btn @click="cancel">Cancel</v-btn>
           </v-form>
         </template>
       </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn @click="cancel">Cancel</v-btn>
+        <v-btn @click="reset">Reset</v-btn>
+        <v-btn
+          @click="submit"
+          :disabled="!valid"
+        >
+          Save
+        </v-btn>
+      </v-card-actions>
     </v-card>
   </v-container>
 </template>
@@ -46,18 +103,13 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { IUserProfile, IUserProfileUpdate } from '@/interfaces';
-import {
-  dispatchGetUsers,
-  dispatchGetRoles,
-  dispatchUpdateUser,
-  readAdminOneUser,
-  readAdminRoles,
-} from '@/store/admin/accessors';
+import { dispatchGetUsers, dispatchUpdateUser, dispatchGetRoles } from '@/store/admin/actions';
+import { readAdminOneUser, readAdminRoles } from '@/store/admin/getters';
 
 @Component
 export default class EditUser extends Vue {
   public valid = true;
-  public name: string = '';
+  public username: string = '';
   public fullName: string = '';
   public email: string = '';
   public setPassword = false;
@@ -82,8 +134,8 @@ export default class EditUser extends Vue {
     this.password2 = '';
     this.$validator.reset();
     if (this.user) {
-      this.name = this.user.name;
-      this.fullName = this.user.human_name;
+      this.username = this.user.username;
+      this.fullName = this.user.full_name;
       this.email = this.user.email;
       this.userDisabled = this.user.disabled;
       this.availableRoles.forEach((role: string) => {
@@ -104,7 +156,7 @@ export default class EditUser extends Vue {
     if (await this.$validator.validateAll()) {
       const updatedProfile: IUserProfileUpdate = {};
       if (this.fullName) {
-        updatedProfile.human_name = this.fullName;
+        updatedProfile.full_name = this.fullName;
       }
       if (this.email) {
         updatedProfile.email = this.email;
@@ -119,14 +171,13 @@ export default class EditUser extends Vue {
       if (this.setPassword) {
         updatedProfile.password = this.password1;
       }
-      const payload = { name: this.name, user: updatedProfile };
-      await dispatchUpdateUser(this.$store, payload);
+      await dispatchUpdateUser(this.$store, { username: this.username, user: updatedProfile });
       this.$router.push('/main/admin/users');
     }
   }
 
   get user() {
-    return readAdminOneUser(this.$store)(this.$router.currentRoute.params.name);
+    return readAdminOneUser(this.$store)(this.$router.currentRoute.params.username);
   }
 
   get availableRoles() {
