@@ -1,20 +1,7 @@
 import logging
 
-from app.core.config import (
-    COUCHBASE_BUCKET_NAME,
-    COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR,
-    COUCHBASE_FULL_TEXT_PORT,
-    COUCHBASE_HOST,
-    COUCHBASE_MEMORY_QUOTA_MB,
-    COUCHBASE_PASSWORD,
-    COUCHBASE_PORT,
-    COUCHBASE_SYNC_GATEWAY_PASSWORD,
-    COUCHBASE_SYNC_GATEWAY_USER,
-    COUCHBASE_USER,
-    FIRST_SUPERUSER,
-    FIRST_SUPERUSER_PASSWORD,
-)
-from app.crud.user import upsert_user
+from app import crud
+from app.core import config
 from app.db.couchbase_utils import (
     config_couchbase,
     ensure_create_bucket,
@@ -32,13 +19,15 @@ from app.models.user import UserInCreate
 
 
 def init_db():
-    cluster_url = get_cluster_http_url(host=COUCHBASE_HOST, port=COUCHBASE_PORT)
+    cluster_url = get_cluster_http_url(
+        host=config.COUCHBASE_HOST, port=config.COUCHBASE_PORT
+    )
     logging.info("before config_couchbase")
     config_couchbase(
-        username=COUCHBASE_USER,
-        password=COUCHBASE_PASSWORD,
-        host=COUCHBASE_HOST,
-        port=COUCHBASE_PORT,
+        username=config.COUCHBASE_USER,
+        password=config.COUCHBASE_PASSWORD,
+        host=config.COUCHBASE_HOST,
+        port=config.COUCHBASE_PORT,
     )
     logging.info("after config_couchbase")
     # COUCHBASE_USER="Administrator"
@@ -46,19 +35,19 @@ def init_db():
     logging.info("before ensure_create_bucket")
     ensure_create_bucket(
         cluster_url=cluster_url,
-        username=COUCHBASE_USER,
-        password=COUCHBASE_PASSWORD,
-        bucket_name=COUCHBASE_BUCKET_NAME,
-        ram_quota_mb=COUCHBASE_MEMORY_QUOTA_MB,
+        username=config.COUCHBASE_USER,
+        password=config.COUCHBASE_PASSWORD,
+        bucket_name=config.COUCHBASE_BUCKET_NAME,
+        ram_quota_mb=config.COUCHBASE_MEMORY_QUOTA_MB,
     )
     logging.info("after ensure_create_bucket")
     logging.info("before get_bucket")
     bucket = get_bucket(
-        COUCHBASE_USER,
-        COUCHBASE_PASSWORD,
-        COUCHBASE_BUCKET_NAME,
-        host=COUCHBASE_HOST,
-        port=COUCHBASE_PORT,
+        config.COUCHBASE_USER,
+        config.COUCHBASE_PASSWORD,
+        config.COUCHBASE_BUCKET_NAME,
+        host=config.COUCHBASE_HOST,
+        port=config.COUCHBASE_PORT,
     )
     logging.info("after get_bucket")
     logging.info("before ensure_create_primary_index")
@@ -69,29 +58,29 @@ def init_db():
     logging.info("after ensure_create_type_index")
     logging.info("before ensure_create_full_text_indexes")
     ensure_create_full_text_indexes(
-        index_dir=COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR,
-        username=COUCHBASE_USER,
-        password=COUCHBASE_PASSWORD,
-        host=COUCHBASE_HOST,
-        port=COUCHBASE_FULL_TEXT_PORT,
+        index_dir=config.COUCHBASE_FULL_TEXT_INDEX_DEFINITIONS_DIR,
+        username=config.COUCHBASE_USER,
+        password=config.COUCHBASE_PASSWORD,
+        host=config.COUCHBASE_HOST,
+        port=config.COUCHBASE_FULL_TEXT_PORT,
     )
     logging.info("after ensure_create_full_text_indexes")
     logging.info("before ensure_create_couchbase_app_user sync")
     ensure_create_couchbase_user(
         cluster_url=cluster_url,
-        username=COUCHBASE_USER,
-        password=COUCHBASE_PASSWORD,
-        new_user_id=COUCHBASE_SYNC_GATEWAY_USER,
-        new_user_password=COUCHBASE_SYNC_GATEWAY_PASSWORD,
+        username=config.COUCHBASE_USER,
+        password=config.COUCHBASE_PASSWORD,
+        new_user_id=config.COUCHBASE_SYNC_GATEWAY_USER,
+        new_user_password=config.COUCHBASE_SYNC_GATEWAY_PASSWORD,
     )
     logging.info("after ensure_create_couchbase_app_user sync")
     logging.info("before upsert_user first superuser")
-    in_user = UserInCreate(
-        username=FIRST_SUPERUSER,
-        password=FIRST_SUPERUSER_PASSWORD,
-        email=FIRST_SUPERUSER,
+    user_in = UserInCreate(
+        username=config.FIRST_SUPERUSER,
+        password=config.FIRST_SUPERUSER_PASSWORD,
+        email=config.FIRST_SUPERUSER,
         admin_roles=[RoleEnum.superuser],
-        admin_channels=[FIRST_SUPERUSER],
+        admin_channels=[config.FIRST_SUPERUSER],
     )
-    upsert_user(bucket, in_user, persist_to=1)
+    crud.user.upsert(bucket, user_in=user_in, persist_to=1)
     logging.info("after upsert_user first superuser")

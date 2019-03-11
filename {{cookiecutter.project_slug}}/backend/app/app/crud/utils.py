@@ -170,9 +170,7 @@ def search_docs(
     )
     if not keys:
         return []
-    doc_results = get_documents_by_keys(
-        bucket=bucket, keys=keys, doc_model=doc_model
-    )
+    doc_results = get_documents_by_keys(bucket=bucket, keys=keys, doc_model=doc_model)
     return doc_results
 
 
