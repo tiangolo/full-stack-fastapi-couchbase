@@ -18,7 +18,11 @@ wait_seconds = 1
     after=after_log(logger, logging.WARN),
 )
 def init():
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        logger.error(e)
+        raise e
 
 
 def main():
