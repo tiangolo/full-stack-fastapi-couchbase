@@ -27,7 +27,7 @@ Automatic interactive documentation with Swagger UI (from the OpenAPI backend): 
 
 Alternative automatic documentation with ReDoc (from the OpenAPI backend): http://localhost/redoc
 
-Couchbase, web administration: http://http://localhost:8091
+Couchbase, web administration: http://localhost:8091
 
 Flower, administration of Celery tasks: http://localhost:5555
 
@@ -210,7 +210,6 @@ To configure it in your stack, follow the section **Change the development "doma
 After performing those steps you should be able to open: http://localhost.tiangolo.com and it will be server by your stack in `localhost`.
 
 Check all the corresponding available URLs in the section at the end.
-
 
 ### Development with a custom IP
 

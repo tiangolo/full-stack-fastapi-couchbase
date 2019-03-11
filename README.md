@@ -136,6 +136,10 @@ After using this generator, your new project (the directory created) will contai
 
 ## Release Notes
 
+### Next
+
+* Update generated README. Minor typos.
+
 ### 0.2.0
 
 **<a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/7" target="_blank">PR #7</a>**:
