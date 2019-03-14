@@ -140,6 +140,10 @@ After using this generator, your new project (the directory created) will contai
 
 * Update generated README. Minor typos.
 
+* Update Couchbase installation, to include Couchbase command line tools.
+
+* Set `/start-reload.sh` as a command override for development by default.
+
 ### 0.2.0
 
 **<a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/7" target="_blank">PR #7</a>**:
