@@ -1,14 +1,17 @@
 import uuid
 from enum import Enum
-from typing import List, Sequence, Type, Union
+from typing import List, Optional, Sequence, Type, TypeVar, Union
 
 from couchbase.bucket import Bucket
 from couchbase.fulltext import MatchAllQuery, QueryStringQuery
 from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
 from pydantic.fields import Field, Shape
 
-from app.core.config import COUCHBASE_BUCKET_NAME
+from app.core import config
+
+PydanticModel = TypeVar("PydanticModel", bound=BaseModel)
 
 
 def generate_new_id():
@@ -25,19 +28,23 @@ def ensure_enums_to_strs(items: Union[Sequence[Union[Enum, str]], Type[Enum]]):
     return str_items
 
 
-def get_all_documents_by_type(bucket: Bucket, *, doc_type: str, skip=0, limit=100):
-    query_str = f"SELECT *, META().id as id FROM {COUCHBASE_BUCKET_NAME} WHERE type = $type LIMIT $limit OFFSET $skip;"
+def get_doc_results_by_type(bucket: Bucket, *, doc_type: str, skip=0, limit=100):
+    query_str = f"SELECT *, META().id as doc_id FROM {config.COUCHBASE_BUCKET_NAME} WHERE type = $type LIMIT $limit OFFSET $skip;"
     q = N1QLQuery(
-        query_str, bucket=COUCHBASE_BUCKET_NAME, type=doc_type, limit=limit, skip=skip
+        query_str,
+        bucket=config.COUCHBASE_BUCKET_NAME,
+        type=doc_type,
+        limit=limit,
+        skip=skip,
     )
     q.consistency = CONSISTENCY_REQUEST
     result = bucket.n1ql_query(q)
     return result
 
 
-def get_documents_by_keys(
-    bucket: Bucket, *, keys: List[str], doc_model=Type[BaseModel]
-):
+def get_docs_by_keys(
+    bucket: Bucket, *, keys: List[str], doc_model=Type[PydanticModel]
+) -> List[PydanticModel]:
     results = bucket.get_multi(keys, quiet=True)
     docs = []
     for result in results.values():
@@ -46,18 +53,28 @@ def get_documents_by_keys(
     return docs
 
 
-def results_to_model(results_from_couchbase: list, *, doc_model: Type[BaseModel]):
+def doc_result_to_model(
+    couchbase_result, *, doc_model: Type[PydanticModel]
+) -> PydanticModel:
+    data = couchbase_result[config.COUCHBASE_BUCKET_NAME]
+    doc = doc_model(**data)
+    return doc
+
+
+def doc_results_to_model(
+    results_from_couchbase: list, *, doc_model: Type[PydanticModel]
+) -> List[PydanticModel]:
     items = []
     for doc in results_from_couchbase:
-        data = doc[COUCHBASE_BUCKET_NAME]
+        data = doc[config.COUCHBASE_BUCKET_NAME]
         doc = doc_model(**data)
         items.append(doc)
     return items
 
 
 def search_results_to_model(
-    results_from_couchbase: list, *, doc_model: Type[BaseModel]
-):
+    results_from_couchbase: list, *, doc_model: Type[PydanticModel]
+) -> List[PydanticModel]:
     items = []
     for doc in results_from_couchbase:
         data = doc.get("fields")
@@ -79,15 +96,17 @@ def search_results_to_model(
 
 
 def get_docs(
-    bucket: Bucket, *, doc_type: str, doc_model=Type[BaseModel], skip=0, limit=100
-):
-    doc_results = get_all_documents_by_type(
+    bucket: Bucket, *, doc_type: str, doc_model=Type[PydanticModel], skip=0, limit=100
+) -> List[PydanticModel]:
+    doc_results = get_doc_results_by_type(
         bucket, doc_type=doc_type, skip=skip, limit=limit
     )
-    return results_to_model(doc_results, doc_model=doc_model)
+    return doc_results_to_model(doc_results, doc_model=doc_model)
 
 
-def get_doc(bucket: Bucket, *, doc_id: str, doc_model: Type[BaseModel]):
+def get_doc(
+    bucket: Bucket, *, doc_id: str, doc_model: Type[PydanticModel]
+) -> Optional[PydanticModel]:
     result = bucket.get(doc_id, quiet=True)
     if not result.value:
         return None
@@ -95,14 +114,65 @@ def get_doc(bucket: Bucket, *, doc_id: str, doc_model: Type[BaseModel]):
     return model
 
 
-def search_docs_get_doc_ids(
+def upsert(
+    bucket: Bucket, *, doc_id: str, doc_in: PydanticModel, persist_to=0, ttl=0
+) -> Optional[PydanticModel]:
+    doc_data = jsonable_encoder(doc_in)
+    with bucket.durability(
+        persist_to=persist_to, timeout=config.COUCHBASE_DURABILITY_TIMEOUT_SECS
+    ):
+        result = bucket.upsert(doc_id, doc_data, ttl=ttl)
+        if result.success:
+            return doc_in
+    return None
+
+
+def update(
+    bucket: Bucket,
+    *,
+    doc_id: str,
+    doc: PydanticModel,
+    doc_updated: PydanticModel,
+    persist_to=0,
+    ttl=0,
+):
+    doc_updated = doc.copy(update=doc_updated.dict(skip_defaults=True))
+    data = jsonable_encoder(doc_updated)
+    with bucket.durability(
+        persist_to=persist_to, timeout=config.COUCHBASE_DURABILITY_TIMEOUT_SECS
+    ):
+        result = bucket.upsert(doc_id, data, ttl=ttl)
+        if result.success:
+            return doc_updated
+
+
+def remove(
+    bucket: Bucket, *, doc_id: str, doc_model: Type[PydanticModel] = None, persist_to=0
+) -> Optional[Union[PydanticModel, bool]]:
+    result = bucket.get(doc_id, quiet=True)
+    if not result.value:
+        return None
+    if doc_model:
+        model = doc_model(**result.value)
+    with bucket.durability(
+        persist_to=persist_to, timeout=config.COUCHBASE_DURABILITY_TIMEOUT_SECS
+    ):
+        result = bucket.remove(doc_id)
+        if not result.success:
+            return None
+        if doc_model:
+            return model
+        return True
+
+
+def search_get_doc_ids(
     bucket: Bucket,
     *,
     query_string: str,
     index_name: str,
     skip: int = 0,
     limit: int = 100,
-):
+) -> List[str]:
     query = QueryStringQuery(query_string)
     hits = bucket.search(index_name, query, skip=skip, limit=limit)
     doc_ids = []
@@ -111,7 +181,7 @@ def search_docs_get_doc_ids(
     return doc_ids
 
 
-def search_get_results(
+def search_get_search_results(
     bucket: Bucket,
     *,
     query_string: str,
@@ -130,7 +200,7 @@ def search_get_results(
     return docs
 
 
-def search_get_results_by_type(
+def search_by_type_get_search_results(
     bucket: Bucket,
     *,
     query_string: str,
@@ -152,16 +222,23 @@ def search_get_results_by_type(
     return docs
 
 
-def search_docs(
+def search_get_docs(
     bucket: Bucket,
     *,
     query_string: str,
     index_name: str,
-    doc_model: Type[BaseModel],
+    doc_model: Type[PydanticModel],
+    doc_type: str = None,
     skip=0,
     limit=100,
-):
-    keys = search_docs_get_doc_ids(
+) -> List[PydanticModel]:
+    if doc_type is not None:
+        type_filter = f"type:{doc_type}"
+        if not query_string:
+            query_string = type_filter
+        if query_string and type_filter not in query_string:
+            query_string += f" {type_filter}"
+    keys = search_get_doc_ids(
         bucket=bucket,
         query_string=query_string,
         index_name=index_name,
@@ -170,20 +247,19 @@ def search_docs(
     )
     if not keys:
         return []
-    doc_results = get_documents_by_keys(bucket=bucket, keys=keys, doc_model=doc_model)
-    return doc_results
+    return get_docs_by_keys(bucket=bucket, keys=keys, doc_model=doc_model)
 
 
-def search_results(
+def search_get_search_results_to_docs(
     bucket: Bucket,
     *,
     query_string: str,
     index_name: str,
-    doc_model: Type[BaseModel],
+    doc_model: Type[PydanticModel],
     skip=0,
     limit=100,
-):
-    doc_results = search_get_results(
+) -> List[PydanticModel]:
+    doc_results = search_get_search_results(
         bucket=bucket,
         query_string=query_string,
         index_name=index_name,
@@ -193,17 +269,17 @@ def search_results(
     return search_results_to_model(doc_results, doc_model=doc_model)
 
 
-def search_results_by_type(
+def search_by_type_get_results_to_docs(
     bucket: Bucket,
     *,
     query_string: str,
     index_name: str,
     doc_type: str,
-    doc_model: Type[BaseModel],
+    doc_model: Type[PydanticModel],
     skip=0,
     limit=100,
-):
-    doc_results = search_get_results_by_type(
+) -> List[PydanticModel]:
+    doc_results = search_by_type_get_search_results(
         bucket=bucket,
         query_string=query_string,
         index_name=index_name,

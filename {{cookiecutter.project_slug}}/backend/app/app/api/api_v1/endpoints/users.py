@@ -7,27 +7,27 @@ from app import crud
 from app.api.utils.security import get_current_active_superuser, get_current_active_user
 from app.core import config
 from app.db.database import get_default_bucket
-from app.models.user import User, UserInCreate, UserInDB, UserInUpdate
+from app.models.user import User, UserCreate, UserInDB, UserUpdate
 from app.utils import send_new_account_email
 
 router = APIRouter()
 
 
-@router.get("/users/", tags=["users"], response_model=List[User])
+@router.get("/", response_model=List[User])
 def read_users(
     skip: int = 0,
     limit: int = 100,
     current_user: UserInDB = Depends(get_current_active_superuser),
 ):
     """
-    Retrieve users
+    Retrieve users.
     """
     bucket = get_default_bucket()
     users = crud.user.get_multi(bucket, skip=skip, limit=limit)
     return users
 
 
-@router.get("/users/search/", tags=["users"], response_model=List[User])
+@router.get("/search/", response_model=List[User])
 def search_users(
     q: str,
     skip: int = 0,
@@ -46,14 +46,14 @@ def search_users(
     return users
 
 
-@router.post("/users/", tags=["users"], response_model=User)
+@router.post("/", response_model=User)
 def create_user(
     *,
-    user_in: UserInCreate,
+    user_in: UserCreate,
     current_user: UserInDB = Depends(get_current_active_superuser),
 ):
     """
-    Create new user
+    Create new user.
     """
     bucket = get_default_bucket()
     user = crud.user.get(bucket, username=user_in.username)
@@ -70,7 +70,7 @@ def create_user(
     return user
 
 
-@router.put("/users/me", tags=["users"], response_model=User)
+@router.put("/me", response_model=User)
 def update_user_me(
     *,
     password: str = Body(None),
@@ -79,9 +79,9 @@ def update_user_me(
     current_user: UserInDB = Depends(get_current_active_user),
 ):
     """
-    Update own user
+    Update own user.
     """
-    user_in = UserInUpdate(**current_user.dict())
+    user_in = UserUpdate(**current_user.dict())
     if password is not None:
         user_in.password = password
     if full_name is not None:
@@ -93,15 +93,15 @@ def update_user_me(
     return user
 
 
-@router.get("/users/me", tags=["users"], response_model=User)
+@router.get("/me", response_model=User)
 def read_user_me(current_user: UserInDB = Depends(get_current_active_user)):
     """
-    Get current user
+    Get current user.
     """
     return current_user
 
 
-@router.post("/users/open", tags=["users"], response_model=User)
+@router.post("/open", response_model=User)
 def create_user_open(
     *,
     username: str = Body(...),
@@ -110,7 +110,7 @@ def create_user_open(
     full_name: str = Body(None),
 ):
     """
-    Create new user without the need to be logged in
+    Create new user without the need to be logged in.
     """
     if not config.USERS_OPEN_REGISTRATION:
         raise HTTPException(
@@ -124,7 +124,7 @@ def create_user_open(
             status_code=400,
             detail="The user with this username already exists in the system",
         )
-    user_in = UserInCreate(
+    user_in = UserCreate(
         username=username, password=password, email=email, full_name=full_name
     )
     user = crud.user.upsert(bucket, user_in=user_in, persist_to=1)
@@ -135,10 +135,10 @@ def create_user_open(
     return user
 
 
-@router.get("/users/{username}", tags=["users"], response_model=User)
+@router.get("/{username}", response_model=User)
 def read_user(username: str, current_user: UserInDB = Depends(get_current_active_user)):
     """
-    Get a specific user by username (email)
+    Get a specific user by username (email).
     """
     bucket = get_default_bucket()
     user = crud.user.get(bucket, username=username)
@@ -151,15 +151,15 @@ def read_user(username: str, current_user: UserInDB = Depends(get_current_active
     return user
 
 
-@router.put("/users/{username}", tags=["users"], response_model=User)
+@router.put("/{username}", response_model=User)
 def update_user(
     *,
     username: str,
-    user_in: UserInUpdate,
+    user_in: UserUpdate,
     current_user: UserInDB = Depends(get_current_active_superuser),
 ):
     """
-    Update a user
+    Update a user.
     """
     bucket = get_default_bucket()
     user = crud.user.get(bucket, username=username)

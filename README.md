@@ -136,6 +136,15 @@ After using this generator, your new project (the directory created) will contai
 
 ## Release Notes
 
+* Update CRUD utils to use types better.
+* Simplify Pydantic model names, from `UserInCreate` to `UserCreate`, etc.
+* Upgrade packages.
+* Add new generic "Items" models, crud utils, endpoints, and tests. To facilitate re-using them to create new functionality. As they are simple and generic (not like Users), it's easier to copy-paste and adapt them to each use case.
+* Update endpoints/*path operations* to simplify code and use new utilities, prefix and tags in `include_router`.
+* Update testing utils.
+* Update linting rules, relax vulture to reduce false positives.
+* Add full text search for items.
+
 ### 0.2.1
 
 * Fix frontend hijacking /docs in development. Using latest https://github.com/tiangolo/node-frontend with custom Nginx configs in frontend. <a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/14" target="_blank">PR #14</a>.
