@@ -10,7 +10,7 @@ from app.core.jwt import create_access_token
 from app.db.database import get_default_bucket
 from app.models.msg import Msg
 from app.models.token import Token
-from app.models.user import User, UserInDB, UserInUpdate
+from app.models.user import User, UserInDB, UserUpdate
 from app.utils import (
     generate_password_reset_token,
     send_reset_password_email,
@@ -20,10 +20,10 @@ from app.utils import (
 router = APIRouter()
 
 
-@router.post("/login/access-token", response_model=Token, tags=["login"])
+@router.post("/login/access-token", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
-    OAuth2 compatible token login, get an access token for future requests
+    OAuth2 compatible token login, get an access token for future requests.
     """
     bucket = get_default_bucket()
     user = crud.user.authenticate(
@@ -42,18 +42,18 @@ def login(form_data: OAuth2PasswordRequestForm = Depends()):
     }
 
 
-@router.post("/login/test-token", tags=["login"], response_model=User)
+@router.post("/login/test-token", response_model=User)
 def test_token(current_user: UserInDB = Depends(get_current_user)):
     """
-    Test access token
+    Test access token.
     """
     return current_user
 
 
-@router.post("/password-recovery/{username}", tags=["login"], response_model=Msg)
+@router.post("/password-recovery/{username}", response_model=Msg)
 def recover_password(username: str):
     """
-    Password Recovery
+    Password Recovery.
     """
     bucket = get_default_bucket()
     user = crud.user.get(bucket, username=username)
@@ -70,10 +70,10 @@ def recover_password(username: str):
     return {"msg": "Password recovery email sent"}
 
 
-@router.post("/reset-password/", tags=["login"], response_model=Msg)
+@router.post("/reset-password/", response_model=Msg)
 def reset_password(token: str, new_password: str):
     """
-    Reset password
+    Reset password.
     """
     username = verify_password_reset_token(token)
     if not username:
@@ -87,6 +87,6 @@ def reset_password(token: str, new_password: str):
         )
     elif not crud.user.is_active(user):
         raise HTTPException(status_code=400, detail="Inactive user")
-    user_in = UserInUpdate(name=username, password=new_password)
+    user_in = UserUpdate(name=username, password=new_password)
     user = crud.user.update(bucket, username=username, user_in=user_in)
     return {"msg": "Password updated successfully"}

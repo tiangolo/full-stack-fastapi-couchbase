@@ -7,15 +7,16 @@ from app.core import config
 from app.core.security import get_password_hash, verify_password
 from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
-from app.models.user import UserInCreate, UserInDB, UserInUpdate, UserSyncIn
+from app.models.user import UserCreate, UserInDB, UserSyncIn, UserUpdate
 
 from . import utils
 
+# Same as file name /app/app/search_index_definitions/users.json
 full_text_index_name = "users"
 
 
-def get_doc_id(username):
-    return f"userprofile::{username}"
+def get_doc_id(username: str):
+    return f"{USERPROFILE_DOC_TYPE}::{username}"
 
 
 def get(bucket: Bucket, *, username: str):
@@ -33,7 +34,7 @@ def get_by_email(bucket: Bucket, *, email: str):
     )
     q.consistency = CONSISTENCY_REQUEST
     doc_results = bucket.n1ql_query(q)
-    users = utils.results_to_model(doc_results, doc_model=UserInDB)
+    users = utils.doc_results_to_model(doc_results, doc_model=UserInDB)
     if not users:
         return None
     return users[0]
@@ -42,7 +43,6 @@ def get_by_email(bucket: Bucket, *, email: str):
 def insert_sync_gateway(user: UserSyncIn):
     name = user.name
     url = f"http://{config.COUCHBASE_SYNC_GATEWAY_HOST}:{config.COUCHBASE_SYNC_GATEWAY_PORT}/{config.COUCHBASE_SYNC_GATEWAY_DATABASE}/_user/{name}"
-
     data = jsonable_encoder(user)
     response = requests.put(url, json=data)
     return response.status_code == 200 or response.status_code == 201
@@ -59,10 +59,9 @@ def update_sync_gateway(user: UserSyncIn):
     return response.status_code == 200 or response.status_code == 201
 
 
-def upsert_in_db(bucket: Bucket, *, user_in: UserInCreate, persist_to=0):
+def upsert_in_db(bucket: Bucket, *, user_in: UserCreate, persist_to=0):
     user_doc_id = get_doc_id(user_in.username)
     passwordhash = get_password_hash(user_in.password)
-
     user = UserInDB(**user_in.dict(), hashed_password=passwordhash)
     doc_data = jsonable_encoder(user)
     with bucket.durability(
@@ -72,14 +71,10 @@ def upsert_in_db(bucket: Bucket, *, user_in: UserInCreate, persist_to=0):
     return user
 
 
-def update_in_db(bucket: Bucket, *, username: str, user_in: UserInUpdate, persist_to=0):
+def update_in_db(bucket: Bucket, *, username: str, user_in: UserUpdate, persist_to=0):
     user_doc_id = get_doc_id(username)
     stored_user = get(bucket, username=username)
-    for field in stored_user.fields:
-        if field in user_in.fields:
-            value_in = getattr(user_in, field)
-            if value_in is not None:
-                setattr(stored_user, field, value_in)
+    stored_user = stored_user.copy(update=user_in.dict(skip_defaults=True))
     if user_in.password:
         passwordhash = get_password_hash(user_in.password)
         stored_user.hashed_password = passwordhash
@@ -91,14 +86,14 @@ def update_in_db(bucket: Bucket, *, username: str, user_in: UserInUpdate, persis
     return stored_user
 
 
-def upsert(bucket: Bucket, *, user_in: UserInCreate, persist_to=0):
+def upsert(bucket: Bucket, *, user_in: UserCreate, persist_to=0):
     user = upsert_in_db(bucket, user_in=user_in, persist_to=persist_to)
     user_in_sync = UserSyncIn(**user_in.dict(), name=user_in.username)
     assert insert_sync_gateway(user_in_sync)
     return user
 
 
-def update(bucket: Bucket, *, username: str, user_in: UserInUpdate, persist_to=0):
+def update(bucket: Bucket, *, username: str, user_in: UserUpdate, persist_to=0):
     user = update_in_db(
         bucket, username=username, user_in=user_in, persist_to=persist_to
     )
@@ -141,20 +136,23 @@ def get_multi(bucket: Bucket, *, skip=0, limit=100):
     return users
 
 
-def search_docs(bucket: Bucket, *, query_string: str, skip=0, limit=100):
-    users = utils.search_docs(
+def search(bucket: Bucket, *, query_string: str, skip=0, limit=100):
+    users = utils.search_get_docs(
         bucket=bucket,
         query_string=query_string,
         index_name=full_text_index_name,
         doc_model=UserInDB,
+        doc_type=USERPROFILE_DOC_TYPE,
         skip=skip,
         limit=limit,
     )
     return users
 
 
-def search(bucket: Bucket, *, query_string: str, skip=0, limit=100):
-    users = utils.search_results_by_type(
+def search_get_search_results_to_docs(
+    bucket: Bucket, *, query_string: str, skip=0, limit=100
+):
+    users = utils.search_by_type_get_results_to_docs(
         bucket=bucket,
         query_string=query_string,
         index_name=full_text_index_name,

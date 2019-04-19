@@ -6,7 +6,7 @@ from app.models.config import USERPROFILE_DOC_TYPE
 from app.models.role import RoleEnum
 
 
-# Shared properties
+# Shared properties in Couchbase and Sync Gateway
 class UserBase(BaseModel):
     email: Optional[str] = None
     admin_roles: Optional[List[Union[str, RoleEnum]]] = None
@@ -14,13 +14,14 @@ class UserBase(BaseModel):
     disabled: Optional[bool] = None
 
 
+# Shared properties in Couchbase
 class UserBaseInDB(UserBase):
     username: Optional[str] = None
     full_name: Optional[str] = None
 
 
 # Properties to receive via API on creation
-class UserInCreate(UserBaseInDB):
+class UserCreate(UserBaseInDB):
     username: str
     password: str
     admin_roles: List[Union[str, RoleEnum]] = []
@@ -29,7 +30,7 @@ class UserInCreate(UserBaseInDB):
 
 
 # Properties to receive via API on update
-class UserInUpdate(UserBaseInDB):
+class UserUpdate(UserBaseInDB):
     password: Optional[str] = None
 
 
@@ -42,8 +43,10 @@ class User(UserBaseInDB):
 class UserInDB(UserBaseInDB):
     type: str = USERPROFILE_DOC_TYPE
     hashed_password: str
+    username: str
 
 
+# Additional properties in Sync Gateway
 class UserSyncIn(UserBase):
     name: str
     password: Optional[str] = None

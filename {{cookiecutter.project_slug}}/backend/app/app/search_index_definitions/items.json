@@ -1,0 +1,15 @@
+{
+    "name": "items",
+    "type": "fulltext-alias",
+    "params": {
+        "targets": {
+            "items_01": {}
+        }
+    },
+    "sourceType": "nil",
+    "sourceName": "",
+    "sourceUUID": "",
+    "sourceParams": null,
+    "planParams": {},
+    "uuid": ""
+}

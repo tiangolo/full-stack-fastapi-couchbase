@@ -1,0 +1,116 @@
+{
+    "name": "items_01",
+    "type": "fulltext-index",
+    "params": {
+        "mapping": {
+            "types": {
+                "item": {
+                    "enabled": true,
+                    "dynamic": false,
+                    "properties": {
+                        "owner_username": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "owner_username",
+                                    "type": "text",
+                                    "analyzer": "keyword",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": true,
+                                    "include_in_all": true
+                                }
+                            ]
+                        },
+                        "description": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "description",
+                                    "type": "text",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": true,
+                                    "include_in_all": true
+                                }
+                            ]
+                        },
+                        "title": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "title",
+                                    "type": "text",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": true,
+                                    "include_in_all": true
+                                }
+                            ]
+                        },
+                        "type": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "type",
+                                    "type": "text",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": false,
+                                    "include_in_all": false
+                                }
+                            ]
+                        },
+                        "id": {
+                            "enabled": true,
+                            "dynamic": false,
+                            "fields": [
+                                {
+                                    "name": "id",
+                                    "type": "text",
+                                    "store": false,
+                                    "index": true,
+                                    "include_term_vectors": false,
+                                    "include_in_all": false
+                                }
+                            ]
+                        }
+                    }
+                }
+            },
+            "default_mapping": {
+                "enabled": false,
+                "dynamic": true
+            },
+            "default_type": "_default",
+            "default_analyzer": "standard",
+            "default_datetime_parser": "dateTimeOptional",
+            "default_field": "_all",
+            "store_dynamic": false,
+            "index_dynamic": true
+        },
+        "store": {
+            "indexType": "scorch",
+            "kvStoreName": ""
+        },
+        "doc_config": {
+            "mode": "type_field",
+            "type_field": "type",
+            "docid_prefix_delim": "",
+            "docid_regexp": ""
+        }
+    },
+    "sourceType": "couchbase",
+    "sourceName": "app",
+    "sourceUUID": "",
+    "sourceParams": {},
+    "planParams": {
+        "maxPartitionsPerPIndex": 171,
+        "numReplicas": 0
+    },
+    "uuid": ""
+}

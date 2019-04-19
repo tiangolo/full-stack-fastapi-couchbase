@@ -15,7 +15,7 @@ from app.db.database import (
 )
 from app.db.full_text_search_utils import ensure_create_full_text_indexes
 from app.models.role import RoleEnum
-from app.models.user import UserInCreate
+from app.models.user import UserCreate
 
 
 def init_db():
@@ -75,7 +75,7 @@ def init_db():
     )
     logging.info("after ensure_create_couchbase_app_user sync")
     logging.info("before upsert_user first superuser")
-    user_in = UserInCreate(
+    user_in = UserCreate(
         username=config.FIRST_SUPERUSER,
         password=config.FIRST_SUPERUSER_PASSWORD,
         email=config.FIRST_SUPERUSER,

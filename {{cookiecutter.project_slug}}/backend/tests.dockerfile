@@ -4,7 +4,7 @@ RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
 RUN echo "deb http://packages.couchbase.com/ubuntu stretch stretch/main" > /etc/apt/sources.list.d/couchbase.list
 RUN apt-get update && apt-get install -y libcouchbase-dev build-essential
 
-RUN pip install requests pytest tenacity passlib[bcrypt] couchbase "fastapi>=0.7.1"
+RUN pip install requests pytest tenacity passlib[bcrypt] couchbase "fastapi>=0.16.0"
 
 # For development, Jupyter remote kernel, Hydrogen
 # Using inside the container:
