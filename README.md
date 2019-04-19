@@ -136,6 +136,8 @@ After using this generator, your new project (the directory created) will contai
 
 ## Release Notes
 
+### 0.3.0
+
 * PR <a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/15" target="_blank">#15</a>:
     * Update CRUD utils to use types better.
     * Simplify Pydantic model names, from `UserInCreate` to `UserCreate`, etc.
