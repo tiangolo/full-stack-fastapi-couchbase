@@ -136,6 +136,8 @@ After using this generator, your new project (the directory created) will contai
 
 ## Release Notes
 
+* Update Jupyter Lab installation and util script/environment variable for local development.
+
 ### 0.3.0
 
 * PR <a href="https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/15" target="_blank">#15</a>:
