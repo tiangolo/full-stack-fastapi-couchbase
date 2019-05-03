@@ -136,6 +136,10 @@ After using this generator, your new project (the directory created) will contai
 
 ## Release Notes
 
+### Next release
+
+* Forward arguments from script to `pytest` inside container.
+
 * Update Jupyter Lab installation and util script/environment variable for local development.
 
 ### 0.3.0
