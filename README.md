@@ -138,6 +138,8 @@ After using this generator, your new project (the directory created) will contai
 
 ### Next release
 
+### 0.4.0
+
 * Fix security on resetting a password. Receive `password` and `token` as body, not query. PR [#16](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/16).
 
 * Forward arguments from script to `pytest` inside container.
