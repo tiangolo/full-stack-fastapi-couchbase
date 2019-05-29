@@ -1,6 +1,6 @@
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 
 from app import crud
@@ -71,7 +71,7 @@ def recover_password(username: str):
 
 
 @router.post("/reset-password/", response_model=Msg)
-def reset_password(token: str, new_password: str):
+def reset_password(token: str = Body(...), new_password: str = Body(...)):
     """
     Reset password.
     """
