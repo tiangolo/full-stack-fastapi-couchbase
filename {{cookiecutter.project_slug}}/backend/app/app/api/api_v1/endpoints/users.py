@@ -1,7 +1,7 @@
 from typing import List
 
 from fastapi import APIRouter, Body, Depends, HTTPException
-from pydantic.types import EmailStr
+from pydantic.networks import EmailStr
 
 from app import crud
 from app.api.utils.security import get_current_active_superuser, get_current_active_user
