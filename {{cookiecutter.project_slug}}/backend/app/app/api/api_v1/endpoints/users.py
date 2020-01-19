@@ -115,7 +115,7 @@ def create_user_open(
     if not config.USERS_OPEN_REGISTRATION:
         raise HTTPException(
             status_code=403,
-            detail="Open user resgistration is forbidden on this server",
+            detail="Open user resistration is forbidden on this server",
         )
     bucket = get_default_bucket()
     user = crud.user.get(bucket, username=username)
