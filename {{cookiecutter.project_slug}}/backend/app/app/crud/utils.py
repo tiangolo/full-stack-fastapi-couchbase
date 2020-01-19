@@ -7,7 +7,7 @@ from couchbase.fulltext import MatchAllQuery, QueryStringQuery
 from couchbase.n1ql import CONSISTENCY_REQUEST, N1QLQuery
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from pydantic.fields import Field, Shape
+from pydantic.fields import Field, SHAPE_LIST, SHAPE_SET, SHAPE_TUPLE
 
 from app.core import config
 
@@ -85,7 +85,7 @@ def search_results_to_model(
             field: Field = doc_model.__fields__[key]
             if not value:
                 value = None
-            elif field.shape in {Shape.LIST, Shape.SET, Shape.TUPLE} and not isinstance(
+            elif field.shape in {SHAPE_LIST, SHAPE_SET, SHAPE_TUPLE} and not isinstance(
                 value, list
             ):
                 value = [value]
