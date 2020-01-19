@@ -138,6 +138,7 @@ After using this generator, your new project (the directory created) will contai
 
 ### Latest Changes
 
+* Update testing scripts and typo.
 * Add normal user Pytest fixture. PR [#23](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/23).
 * Update Dockerfiles to use Couchbase from Debian image. PR [#20](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/20) by [@Gjacquenot](https://github.com/Gjacquenot).
 * Use new Pydantic types. PR [#21](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/21) by [@tehtbl](https://github.com/tehtbl).
