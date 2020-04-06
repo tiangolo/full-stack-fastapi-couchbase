@@ -138,6 +138,7 @@ After using this generator, your new project (the directory created) will contai
 
 ### Latest Changes
 
+* Simplify Traefik labels for services. PR [#27](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/27).
 * Fix Flower Docker configuration. PR [#24](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/24).
 * Update testing scripts and typo.
 * Add normal user Pytest fixture. PR [#23](https://github.com/tiangolo/full-stack-fastapi-couchbase/pull/23).
