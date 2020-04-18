@@ -2,6 +2,48 @@
 
 [![Build Status](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase)
 
+## ⚠️ WARNING ⚠️
+
+I'm currently not actively using Couchbase nor this generator for any project.
+
+If you are starting a new project from scratch, check the alternatives at the [FastAPI docs: Project Generation](https://fastapi.tiangolo.com/project-generation/).
+
+For example, the project generator [Full Stack FastAPI PostgreSQL](https://github.com/tiangolo/full-stack-fastapi-postgresql) might be a better alternative, as it is actively maintained and used. And it includes all the new features and improvements.
+
+You are still free to use this project if you want to, it should probably still work fine, and if you already have a project generated with it that's fine as well (and you probably already updated it to suit your needs).
+
+But maintaining it in sync with [Full Stack FastAPI PostgreSQL](https://github.com/tiangolo/full-stack-fastapi-postgresql) including all the new features and development done there is currently not being feasible. So, I won't be able to update it much.
+
+### To have in mind
+
+Here are some extra thoughts you might want to consider if you decide to go with Couchbase and/or this project generator.
+
+#### Pros
+
+Couchbase has a great set of features that is not easily or commonly found in alternatives.
+
+It's a distributed database, so, if you have a cluster of several nodes with the data replicated, you don't have a single point of failure.
+
+It provides very high performance.
+
+It has built-in full-text search integrated (using Bleve). It's possible to make all the records be automatically indexed in the search engine without additional code or extra components.
+
+It can be connected/integrated with the Couchbase Sync Gateway, that can be used to synchronize a subset of documents (records) with mobile devices. And with some effort, it can be connected with PouchBD for frontend synchronization (although not querying and/or searching from the frontend, as would be possible with CouchDB).
+
+#### Cons
+
+The documentation is very scarce. This is sadly a big problem. Many features are not well documented, or not documented at all.
+
+Many configurations are not documented and have to be inferred from comments in forums, reading source code, or checking the configurations for the C client and trying different query parameters in URLs, that becomes quite error prone.
+
+Couchbase didn't seem to be designed to be integrated into CI systems as in this project (or alternatives), at least until the last time I used it. It expects all the set up to be done once via the web UI, not automated. The official Docker image can't be configured. So, this project does all the configuration by sending the HTTP requests from the backend code to the container replicating the HTTP requests done in the web UI. But those steps are not documented, there's no "official" way to configure and start it without using the web UI, so the integration with CI could be error prone.
+
+The Couchbase Sync Gateway official Docker image is not designed to be configured much either, so, the `Dockerfile` included in this project adds a good amount of custom logic to support that, but that's not really official.
+
+As it uses N1QL, a flavor of SQL, and there's no easy integration with Python, you have to do all the operations in N1QL strings and integrate them with your own code. Without editor support, completion, nor syntax checks for N1QL.
+
+---
+
 Generate a backend and frontend stack using Python, including interactive API documentation.
 
 [![Screenshot](https://fastapi.tiangolo.com/img/index/index-03-swagger-02.png)](https://github.com/tiangolo/full-stack-fastapi-couchbase)
