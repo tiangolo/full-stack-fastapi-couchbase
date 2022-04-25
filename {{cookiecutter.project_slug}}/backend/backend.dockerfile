@@ -8,13 +8,13 @@ RUN wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key |
     apt-get update && apt-get install -y libcouchbase3 libcouchbase-dev libcouchbase3-tools libcouchbase-dbg libcouchbase3-libev build-essential
 
 RUN pip install \
-    celery~=4.3 \
+    celery \
     passlib[bcrypt] \
     tenacity \
     requests \
     couchbase \
     emails \
-    "fastapi>=0.16.0" \
+    fastapi \
     uvicorn \
     gunicorn \
     pyjwt \
