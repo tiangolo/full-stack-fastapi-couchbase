@@ -1,8 +1,9 @@
 FROM python:3.6
 
-RUN wget -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add - && \
+RUN wget -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | apt-key add - && \
     OS_CODENAME=`cat /etc/os-release | grep VERSION_CODENAME | cut -f2 -d=` && \
-    echo "deb http://packages.couchbase.com/ubuntu ${OS_CODENAME} ${OS_CODENAME}/main" > /etc/apt/sources.list.d/couchbase.list && \
+    VERSION_ID=`cat /etc/os-release | grep VERSION_ID | cut -f2 -d= | cut -f2 -d'"'` && \
+    echo "deb https://packages.couchbase.com/clients/c/repos/deb/debian${VERSION_ID} ${OS_CODENAME} ${OS_CODENAME}/main" > /etc/apt/sources.list.d/couchbase.list && \
     apt-get update && apt-get install -y libcouchbase-dev build-essential
 
 RUN pip install requests pytest tenacity passlib[bcrypt] couchbase "fastapi>=0.16.0"
