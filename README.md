@@ -1,18 +1,16 @@
-# Full Stack FastAPI Couchbase - project generator
-
-[![Build Status](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase)
-
-## ⚠️ WARNING ⚠️
+## 🚨 DEPRECATION WARNING 🚨
 
 I'm currently not actively using Couchbase nor this generator for any project.
 
+You might still find some internal pieces of code useful for your own use cases, but I won't be able to fix bugs and add features.
+
 If you are starting a new project from scratch, check the alternatives at the [FastAPI docs: Project Generation](https://fastapi.tiangolo.com/project-generation/).
 
-For example, the project generator [Full Stack FastAPI PostgreSQL](https://github.com/tiangolo/full-stack-fastapi-postgresql) might be a better alternative, as it is actively maintained and used. And it includes all the new features and improvements.
+You are still free to use this project if you want to, you might still find some internal pieces of code useful for your own use case. And if you already have a project generated with it that's fine as well (and you probably already updated it to suit your needs).
 
-You are still free to use this project if you want to, it should probably still work fine, and if you already have a project generated with it that's fine as well (and you probably already updated it to suit your needs).
+# Full Stack FastAPI Couchbase - project generator
 
-But maintaining it in sync with [Full Stack FastAPI PostgreSQL](https://github.com/tiangolo/full-stack-fastapi-postgresql) including all the new features and development done there is currently not being feasible. So, I won't be able to update it much.
+[![Build Status](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase.svg?branch=master)](https://travis-ci.org/tiangolo/full-stack-fastapi-couchbase)
 
 ### To have in mind
 
